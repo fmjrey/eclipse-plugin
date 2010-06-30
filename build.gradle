@@ -51,6 +51,11 @@ buildscript {
 	} 
 }
 
+
+if(!hasProperty('eclipseLocation')){
+	throw (new InvalidUserDataException("The property 'eclipseLocation' not set. Use -PeclipseLocation=/Path/to/eclipse"))
+}
+
 configure(FeaturePde){	
 	def projectDir = getRootDir()
 	featureName = "org.gradle.eclipse.feature"
@@ -143,7 +148,7 @@ task mergeGradleDist(dependsOn:'copyFragments') << {
 	}	
 	
 	String bundleClasspath = createBundleClasspath(zipContent);
-	File manifestFile = new File('build/tmp/plugins/org.codehaus.gradle/META-INF/MANIFEST.MF')
+	File manifestFile = file('build/tmp/plugins/org.codehaus.gradle/META-INF/MANIFEST.MF')
 		
 	def manifestContent = manifestFile.text
 	manifestContent = manifestContent.replaceAll(BUNDLE_CLASSPATH_PLACEHOLDER, bundleClasspath)
