@@ -24,6 +24,15 @@ public class GradleProcessResult {
 
 	private boolean complete = false;
 	private int result = 0;
+	private String output;
+	
+	public String getOutput() {
+		return output;
+	}
+
+	public void setOutput(String output) {
+		this.output = output;
+	}
 
 	public int getResult() {
 		return result;

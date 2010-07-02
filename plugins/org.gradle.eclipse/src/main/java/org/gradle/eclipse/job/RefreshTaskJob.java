@@ -83,6 +83,7 @@ public class RefreshTaskJob extends AbstractGradleJob{
 	           public void requestExecutionComplete( Request request, int result, String output ) {
 	        	   processResult.setComplete(true);
 	        	   processResult.setResult(result);
+	        	   processResult.setOutput(output);
 	           }
 	        };
 
@@ -103,6 +104,8 @@ public class RefreshTaskJob extends AbstractGradleJob{
 			return new Status(IStatus.ERROR, GradlePlugin.PLUGIN_ID,
 					"Error while starting Gradle Process. Please check that GRADLE_HOME is defined correctly in your preferences!", executionlistener
 							.getThrowable());
+		}else if( processResult.getResult() == 1) {
+			return new Status(IStatus.ERROR, GradlePlugin.PLUGIN_ID, processResult.getOutput(), executionlistener.getThrowable());
 		}
 		return Status.OK_STATUS;	
 	}

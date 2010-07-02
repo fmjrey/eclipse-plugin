@@ -61,22 +61,6 @@ public class GradlePlugin extends AbstractUIPlugin {
 	// The plug-in ID
 	public static final String PLUGIN_ID = IGradleConstants.PLUGIN_ID;
 	
-//	public static final int ERROR_LIBRARY_NOT_SPECIFIED = 0;
-
-//	public static final int ERROR_MALFORMED_URL = 0;
-
-	/**
-	 * Simple identifier constant (value <code>"headless"</code>) of a tag
-	 */
-//	public static final String HEADLESS = "headless"; //$NON-NLS-1$
-
-	/**
-	 * Status code indicating an error occurred running a build.
-	 * @since 2.1
-	 */
-//	public static final int ERROR_RUNNING_BUILD = 1;
-	
-	
 	// The shared instance
 	private static GradlePlugin plugin;
 	

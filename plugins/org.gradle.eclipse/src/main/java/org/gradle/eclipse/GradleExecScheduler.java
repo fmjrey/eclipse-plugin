@@ -25,6 +25,8 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.core.variables.VariablesPlugin;
 import org.eclipse.debug.core.ILaunchConfiguration;
+import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.swt.widgets.Display;
 import org.gradle.eclipse.job.BuildJob;
 import org.gradle.eclipse.job.RefreshTaskJob;
 import org.gradle.eclipse.launchConfigurations.GradleProcess;
@@ -88,7 +90,15 @@ public class GradleExecScheduler {
 					job.schedule(); // start as soon as possible
 				}
 				else{
-					job.calculateTasks(null);
+					// something wrong while calculating tasks
+					final IStatus clcTsksStatus = job.calculateTasks(null);
+					if(!clcTsksStatus.isOK()){
+						final Display display = Display.getCurrent();
+						display.asyncExec(new Runnable() {
+					    		public void run() {
+					    			MessageDialog.openError(display.getActiveShell(), "Error while calculating gradle tasks", clcTsksStatus.getMessage());					    		}
+					    });
+					}
 				}			
 			}
 		}
