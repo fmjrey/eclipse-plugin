@@ -97,9 +97,7 @@ public class RefreshTaskJob extends AbstractGradleJob{
 				return new Status(IStatus.WARNING, GradlePlugin.PLUGIN_ID, "Error while recalculating Gradle Tasks", e);
 			}
 		}
-		List<ProjectView> projects = pluginLord.getProjects();
-		cache.put(buildFilePath, projects);
-		
+				
 		if( processResult.getResult() == -1) {
 			return new Status(IStatus.ERROR, GradlePlugin.PLUGIN_ID,
 					"Error while starting Gradle Process. Please check that GRADLE_HOME is defined correctly in your preferences!", executionlistener
@@ -107,6 +105,10 @@ public class RefreshTaskJob extends AbstractGradleJob{
 		}else if( processResult.getResult() == 1) {
 			return new Status(IStatus.ERROR, GradlePlugin.PLUGIN_ID, processResult.getOutput(), executionlistener.getThrowable());
 		}
+		
+		List<ProjectView> projects = pluginLord.getProjects();
+		cache.put(buildFilePath, projects);
+
 		return Status.OK_STATUS;	
 	}
 
