@@ -42,7 +42,18 @@
       </page>
    </extension>
 
-       
+   <extension
+         id="gradleNature"
+         name="Gradle Nature"
+         point="org.eclipse.core.resources.natures">
+      <runtime>
+         <run class="org.gradle.eclipse.GradleNature"/>
+      </runtime>
+      <requires-nature id="org.eclipse.jdt.core.javanature"/>
+      <content-type
+            id="org.gradle.eclipse.contenttype.buildfile">
+   	</content-type>
+   </extension>
     
    <extension
          point="org.eclipse.debug.core.launchConfigurationTypes">
@@ -125,7 +136,43 @@
               id="org.gradle.eclipse.GradleLaunchConfigurationType">
         </configurationType>
       </shortcut>
-   </extension><!--
+   </extension>
+   
+    <extension point="org.eclipse.ui.popupMenus">
+		<!--
+		Restrict selection to be a project with a Groovy nature.
+		Specifying an "IJavaProject" objectClass would mean that
+		this contribution would become unavailable for web and EJB
+		projects in IBM Rational 6.x tools.
+		--> 
+
+		<!-- In "Configure" sub-menu -->
+    <objectContribution
+           adaptable="true"
+           id="org.gradle.eclipse.nonGradleContributions"
+           objectClass="org.eclipse.core.resources.IProject">
+        <action
+              class="org.gradle.eclipse.actions.AddGradleNatureAction"
+              enablesFor="1"
+              id="org.gradle.eclipse.addnature.action"
+              label="Convert to Gradle Project"
+              menubarPath="org.eclipse.ui.projectConfigure/additions">
+        </action>
+        <visibility>
+         	<and>
+	         	<objectState name="nature" value="org.eclipse.jdt.core.javanature"/>
+	         	<not>
+		         	<objectState name="nature" value="org.gradle.eclipse.gradleNature"/>
+		        </not>
+		        <objectState name="open" value="true"/>
+		      </and>
+        </visibility>
+     </objectContribution>
+   </extension>
+   
+   
+   
+   <!--
    <extension
          point="org.eclipse.ui.editors">
       <editor
@@ -137,7 +184,7 @@
             id="org.gradle.eclipse.editors.BasicGradleEditor"
             name="Gradle Editor">
             <contentTypeBinding
-               contentTypeId="org.codehaus.groovy.eclipse.groovySource">
+               contentTypeId="org.codehaus.gradle.eclipse.groovySource">
          </contentTypeBinding>
       </editor>
    </extension>-->

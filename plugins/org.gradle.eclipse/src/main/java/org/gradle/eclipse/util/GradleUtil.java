@@ -16,30 +16,38 @@
 package org.gradle.eclipse.util;
 
 import java.io.File;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 import java.util.StringTokenizer;
 
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
+import org.gradle.eclipse.GradleNature;
 
 /**
  * @author Rene Groeschke
  * @FIXME refactor this class
  * */
 public class GradleUtil {
-	
+
 	/**
 	 * Returns the list of Strings that were delimiter separated.
 	 * 
-	 * @param delimString the String to be tokenized based on the delimiter
+	 * @param delimString
+	 *            the String to be tokenized based on the delimiter
 	 * @return a list of Strings
 	 */
 	public static String[] parseString(String delimString, String delim) {
 		if (delimString == null) {
 			return new String[0];
 		}
-		
+
 		// Need to handle case where separator character is
 		// actually part of the target name!
 		StringTokenizer tokenizer = new StringTokenizer(delimString, delim);
@@ -47,19 +55,19 @@ public class GradleUtil {
 		for (int i = 0; i < results.length; i++) {
 			results[i] = tokenizer.nextToken();
 		}
-		
+
 		return results;
 	}
-	
+
 	/**
-	 * Returns the workspace file associated with the given path in the
-	 * local file system, or <code>null</code> if none.
-	 * If the path happens to be a relative path, then the path is interpreted as
-	 * relative to the specified parent file.
+	 * Returns the workspace file associated with the given path in the local
+	 * file system, or <code>null</code> if none. If the path happens to be a
+	 * relative path, then the path is interpreted as relative to the specified
+	 * parent file.
 	 * 
-	 * Attempts to handle linked files; the first found linked file with the correct
-	 * path is returned.
-	 *   
+	 * Attempts to handle linked files; the first found linked file with the
+	 * correct path is returned.
+	 * 
 	 * @param path
 	 * @param buildFileParent
 	 * @return file or <code>null</code>
@@ -69,20 +77,23 @@ public class GradleUtil {
 		if (path == null) {
 			return null;
 		}
-		IPath filePath= new Path(path);
+		IPath filePath = new Path(path);
 		IFile file = null;
-;		System.out.println(filePath.toFile().getAbsolutePath());
-		IFile[] files= ResourcesPlugin.getWorkspace().getRoot().findFilesForLocationURI(filePath.toFile().toURI());
+		;
+		System.out.println(filePath.toFile().getAbsolutePath());
+		IFile[] files = ResourcesPlugin.getWorkspace().getRoot()
+				.findFilesForLocationURI(filePath.toFile().toURI());
 		if (files.length > 0) {
-			file= files[0];
+			file = files[0];
 		}
 		if (file == null) {
-			//relative path
+			// relative path
 			try {
-				//this call is ok if buildFileParent is null
-				files= ResourcesPlugin.getWorkspace().getRoot().findFilesForLocationURI(filePath.toFile().toURI());
+				// this call is ok if buildFileParent is null
+				files = ResourcesPlugin.getWorkspace().getRoot()
+						.findFilesForLocationURI(filePath.toFile().toURI());
 				if (files.length > 0) {
-					file= files[0];
+					file = files[0];
 				} else {
 					return null;
 				}
@@ -90,18 +101,19 @@ public class GradleUtil {
 				return null;
 			}
 		}
-		
+
 		if (file.exists()) {
 			return file;
-		} 
-		File ioFile= file.getLocation().toFile();
-		if (ioFile.exists()) {//needs to handle case insensitivity on WINOS
-			files= ResourcesPlugin.getWorkspace().getRoot().findFilesForLocationURI(ioFile.toURI());
+		}
+		File ioFile = file.getLocation().toFile();
+		if (ioFile.exists()) {// needs to handle case insensitivity on WINOS
+			files = ResourcesPlugin.getWorkspace().getRoot()
+					.findFilesForLocationURI(ioFile.toURI());
 			if (files.length > 0) {
 				return files[0];
-			}			
+			}
 		}
-			
+
 		return null;
 	}
 
@@ -109,8 +121,34 @@ public class GradleUtil {
 		if (filePath == null) {
 			return null;
 		}
-		IFile file = ResourcesPlugin.getWorkspace().getRoot().getFileForLocation(filePath);
+		IFile file = ResourcesPlugin.getWorkspace().getRoot()
+				.getFileForLocation(filePath);
 		return file;
 	}
 
+	public static void addGradleNature(final IProject project)
+			throws CoreException {
+		final IProjectDescription description = project.getDescription();
+		final String[] ids = description.getNatureIds();
+
+		final String[] newIds = new String[ids == null ? 1 : ids.length + 1];
+		newIds[0] = GradleNature.GRADLE_NATURE;
+		if (ids != null) {
+			for (int i = 1; i < newIds.length; i++) {
+				newIds[i] = ids[i - 1];
+			}
+		}
+
+		description.setNatureIds(newIds);
+		project.setDescription(description, null);
+	}
+
+	public static void removeGroovyNature(final IProject project)
+			throws CoreException {
+		final IProjectDescription description = project.getDescription();
+		List<String> ids = Arrays.asList(description.getNatureIds());
+		ids.remove(GradleNature.GRADLE_NATURE);
+		description.setNatureIds(ids.toArray(new String[ids.size()]));
+		project.setDescription(description, null);
+	}
 }
