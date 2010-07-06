@@ -16,6 +16,7 @@
 package org.gradle.eclipse.util;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -143,10 +144,10 @@ public class GradleUtil {
 		project.setDescription(description, null);
 	}
 
-	public static void removeGroovyNature(final IProject project)
+	public static void removeGradleNature(final IProject project)
 			throws CoreException {
 		final IProjectDescription description = project.getDescription();
-		List<String> ids = Arrays.asList(description.getNatureIds());
+		List<String> ids = new ArrayList<String>(Arrays.asList(description.getNatureIds()));
 		ids.remove(GradleNature.GRADLE_NATURE);
 		description.setNatureIds(ids.toArray(new String[ids.size()]));
 		project.setDescription(description, null);

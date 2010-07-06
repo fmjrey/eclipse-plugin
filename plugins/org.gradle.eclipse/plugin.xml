@@ -139,14 +139,23 @@
    </extension>
    
     <extension point="org.eclipse.ui.popupMenus">
-		<!--
-		Restrict selection to be a project with a Groovy nature.
-		Specifying an "IJavaProject" objectClass would mean that
-		this contribution would become unavailable for web and EJB
-		projects in IBM Rational 6.x tools.
-		--> 
+    	<!-- Restrict selection to be a project with a Gradle nature.--> 
+   		<objectContribution id="org.gradle.eclipse.gradlemenu"
+   			adaptable="true"
+   			objectClass="org.eclipse.core.resources.IProject">
+	        <menu
+	              id="gradle"
+	              label="Gradle"
+	              path="additions">
+	           <separator name="defaultGroup"/>
+        	</menu>
+        <visibility>
+           <objectState name="nature" value="org.gradle.eclipse.gradleNature"/>
+        </visibility>
+		</objectContribution>
 
-		<!-- In "Configure" sub-menu -->
+    	
+	<!-- In "Configure" sub-menu -->
     <objectContribution
            adaptable="true"
            id="org.gradle.eclipse.nonGradleContributions"
@@ -168,6 +177,20 @@
 		      </and>
         </visibility>
      </objectContribution>
+     <objectContribution id="org.gradle.eclipse.gradleContributions"
+   			adaptable="true"
+   			objectClass="org.eclipse.core.resources.IProject">
+			   <action
+			         class="org.gradle.eclipse.actions.RemoveGradleNatureAction"
+			         enablesFor="1"
+			         id="org.gradle.eclipse.removenature.action"
+			         label="Remove Gradle nature"
+			         menubarPath="gradle/nature">
+			   </action>
+			   <visibility>
+			      <objectState name="nature" value="org.gradle.eclipse.gradleNature"/>
+			   </visibility>
+		</objectContribution>
    </extension>
    
    
