@@ -31,14 +31,14 @@ import org.gradle.gradleplugin.foundation.request.RefreshTaskListRequest;
 import org.gradle.gradleplugin.foundation.request.Request;
 
 
-public class BuildJob extends AbstractGradleJob {
+public class ConfigurationBasedBuildJob extends AbstractGradleJob {
 
 	private final GradlePluginLord pluginLord;
 	private final GradleProcess process;
 	private final ILaunchConfiguration configuration;
 	private final String commandLine;
 
-	public BuildJob(GradlePluginLord gradlePluginLord, GradleProcess process,
+	public ConfigurationBasedBuildJob(GradlePluginLord gradlePluginLord, GradleProcess process,
 			ILaunchConfiguration configuration, String commandLine) {
 
 		super("Running Gradle Build...");

@@ -27,8 +27,9 @@ import org.eclipse.core.variables.VariablesPlugin;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.widgets.Display;
-import org.gradle.eclipse.job.BuildJob;
+import org.gradle.eclipse.job.ConfigurationBasedBuildJob;
 import org.gradle.eclipse.job.RefreshTaskJob;
+import org.gradle.eclipse.job.UpdateClasspathJob;
 import org.gradle.eclipse.launchConfigurations.GradleProcess;
 import org.gradle.foundation.ProjectView;
 import org.gradle.gradleplugin.foundation.GradlePluginLord;
@@ -57,8 +58,6 @@ public class GradleExecScheduler {
 	private GradleExecScheduler(){
 		this.cache = new BuildInformationCache();
 	}
-
-
 
 	// these both methods should be moved to BuildInformationCache
 	public List<ProjectView> getProjectViews(IFile buildFile){
@@ -104,6 +103,24 @@ public class GradleExecScheduler {
 		}
 	}
 	
+	public void updateProjectClasspath(String absoluteBuildPath) throws CoreException{
+		final GradlePluginLord gradlePluginLord = new GradlePluginLord();
+		gradlePluginLord.setGradleHomeDirectory(new File(GradlePlugin.getPlugin().getGradleHome()));
+
+		File buildFile = new File(VariablesPlugin.getDefault().getStringVariableManager().performStringSubstitution(absoluteBuildPath));
+		if(buildFile==null || !buildFile.exists()){
+			throw(new CoreException(new Status(IStatus.ERROR, IGradleConstants.PLUGIN_ID, 
+											   "buildPath: [ " + absoluteBuildPath + "] cannot be resolved")
+				 ));
+		}
+			
+		// create gradle build job
+		Job job = new UpdateClasspathJob(gradlePluginLord, absoluteBuildPath);
+		job.setUser(true);
+		job.setPriority(Job.LONG);
+		job.schedule(); // start as soon as possible
+	}
+	
 	public void startGradleBuildRun(final ILaunchConfiguration configuration, final StringBuffer commandLine, final GradleProcess gradleProcess) throws CoreException{
 		final GradlePluginLord gradlePluginLord = new GradlePluginLord();
 		gradlePluginLord.setGradleHomeDirectory(new File(GradlePlugin.getPlugin().getGradleHome()));
@@ -122,7 +139,7 @@ public class GradleExecScheduler {
 		
 		
 		// create gradle build job
-		Job job = new BuildJob(gradlePluginLord, gradleProcess, configuration, commandLine.toString());
+		Job job = new ConfigurationBasedBuildJob(gradlePluginLord, gradleProcess, configuration, commandLine.toString());
 		job.setUser(true);
 		job.setPriority(Job.LONG);
 		job.schedule(); // start as soon as possible

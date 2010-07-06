@@ -187,6 +187,13 @@
 			         label="Remove Gradle nature"
 			         menubarPath="gradle/nature">
 			   </action>
+			   <action
+			         class="org.gradle.eclipse.actions.UpdateClasspathAction"
+			         enablesFor="1"
+			         id="org.gradle.eclipse.updateclasspath.action"
+			         label="Update Classpath"
+			         menubarPath="gradle/classpath">
+			   </action>
 			   <visibility>
 			      <objectState name="nature" value="org.gradle.eclipse.gradleNature"/>
 			   </visibility>

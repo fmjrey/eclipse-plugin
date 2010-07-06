@@ -313,4 +313,20 @@ public class GradlePlugin extends AbstractUIPlugin {
 	public static Color getPreferenceColor(String pref) {
 		return ColorManager.getDefault().getColor(PreferenceConverter.getColor(getDefault().getPreferenceStore(), pref));
 	}
+
+	public String getInitScriptFolder(){
+		String scriptFolderPath  = "scripts";
+		URL entryURL = getBundle().getEntry("scripts");
+		try{
+			URL fileURL = FileLocator.toFileURL(entryURL);
+			scriptFolderPath = new File(fileURL.getPath()).getAbsolutePath();
+		} catch (IOException e) {
+			GradlePlugin.log(newErrorStatus("unable to locate init script folder", e));
+		}
+		return scriptFolderPath;
+	}
+
+	public String getInitScript(String script) {
+		return getInitScriptFolder() + File.separator + script;
+	}
 }

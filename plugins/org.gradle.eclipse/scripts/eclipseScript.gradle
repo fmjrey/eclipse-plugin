@@ -1,0 +1,1 @@
+apply from:'file:///Users/Rene/workspaces/gradle/github/eclipse-plugin/plugins/org.gradle.eclipse/scripts/eclipse.gradle'
