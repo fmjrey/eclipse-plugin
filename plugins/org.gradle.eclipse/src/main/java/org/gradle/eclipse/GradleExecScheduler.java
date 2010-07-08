@@ -19,6 +19,7 @@ import java.io.File;
 import java.util.List;
 
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -103,7 +104,7 @@ public class GradleExecScheduler {
 		}
 	}
 	
-	public void updateProjectClasspath(String absoluteBuildPath) throws CoreException{
+	public void updateProjectClasspath(String absoluteBuildPath, IProject projectToUpdate) throws CoreException{
 		final GradlePluginLord gradlePluginLord = new GradlePluginLord();
 		gradlePluginLord.setGradleHomeDirectory(new File(GradlePlugin.getPlugin().getGradleHome()));
 
@@ -115,7 +116,7 @@ public class GradleExecScheduler {
 		}
 			
 		// create gradle build job
-		Job job = new UpdateClasspathJob(gradlePluginLord, absoluteBuildPath);
+		Job job = new UpdateClasspathJob(projectToUpdate, gradlePluginLord, absoluteBuildPath);
 		job.setUser(true);
 		job.setPriority(Job.LONG);
 		job.schedule(); // start as soon as possible

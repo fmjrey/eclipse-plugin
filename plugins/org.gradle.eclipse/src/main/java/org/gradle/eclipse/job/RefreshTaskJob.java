@@ -25,7 +25,7 @@ import org.gradle.eclipse.BuildInformationCache;
 import org.gradle.eclipse.GradlePlugin;
 import org.gradle.eclipse.interaction.GradleProcessExecListener;
 import org.gradle.eclipse.interaction.GradleProcessResult;
-import org.gradle.eclipse.interaction.GradleRefreshRequestExecutionInteraction;
+import org.gradle.eclipse.interaction.GradleBackgroundRequestExecutionInteraction;
 import org.gradle.foundation.ProjectView;
 import org.gradle.gradleplugin.foundation.GradlePluginLord;
 import org.gradle.gradleplugin.foundation.request.ExecutionRequest;
@@ -61,7 +61,7 @@ public class RefreshTaskJob extends AbstractGradleJob{
 	 * */
 	
 	public IStatus calculateTasks(IProgressMonitor monitor){
-		final GradleProcessExecListener executionlistener = new GradleRefreshRequestExecutionInteraction(monitor);
+		final GradleProcessExecListener executionlistener = new GradleBackgroundRequestExecutionInteraction(monitor);
 		
 		pluginLord.startExecutionQueue();
 		final GradleProcessResult processResult = new GradleProcessResult();

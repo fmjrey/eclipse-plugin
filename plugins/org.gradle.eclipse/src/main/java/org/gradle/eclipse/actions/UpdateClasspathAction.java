@@ -43,14 +43,13 @@ public class UpdateClasspathAction implements IObjectActionDelegate {
            for (IProject project : currSelected) {
         	   IFile file = project.getFile("build.gradle");
         	   
-        	   try {
-				GradleExecScheduler.getInstance().updateProjectClasspath(file.getLocationURI().getPath());
-			} catch (CoreException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-        	   
-        	   System.out.println("updating classpath of " + project.getName());
+  				try {
+					GradleExecScheduler.getInstance().updateProjectClasspath(file.getLocationURI().getPath(), project);
+				} catch (CoreException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+
            }
         }
     }
