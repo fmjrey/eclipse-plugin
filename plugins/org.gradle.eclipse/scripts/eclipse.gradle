@@ -1,1 +1,7 @@
-apply(plugin:'eclipse')
+addListener(new ApplyPluginListener())
+
+class ApplyPluginListener extends BuildAdapter {
+    public void projectsEvaluated(Gradle gradle) {
+        gradle.rootProject.allprojects { apply plugin: 'eclipse' }
+    }
+} 
