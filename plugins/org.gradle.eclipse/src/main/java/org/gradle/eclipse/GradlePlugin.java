@@ -64,6 +64,7 @@ public class GradlePlugin extends AbstractUIPlugin {
 	// The shared instance
 	private static GradlePlugin plugin;
 	
+	private String cachedDefaultGradleHome = null;
 
 	/**
 	 * Returns the standard display to be used. The method first checks, if
@@ -77,6 +78,7 @@ public class GradlePlugin extends AbstractUIPlugin {
 		}
 		return display;
 	}
+
 	
 	/**
 	 * The constructor
@@ -267,7 +269,9 @@ public class GradlePlugin extends AbstractUIPlugin {
 	
 	private String getDefaultGradleHome() {
 		//use default gradlehome 
-		String gradleHomeString = null;
+		if(cachedDefaultGradleHome != null){
+			return cachedDefaultGradleHome;
+		}
 		ServiceTracker tracker = new ServiceTracker(GradlePlugin.getPlugin().getBundle().getBundleContext(), PackageAdmin.class.getName(), null);
 		tracker.open();
 		try {
@@ -279,7 +283,7 @@ public class GradlePlugin extends AbstractUIPlugin {
 				if(bundle!=null){
 					URL entryURL = bundle.getEntry(".");
 					URL fileURL = FileLocator.toFileURL(entryURL);
-					gradleHomeString = new File(fileURL.getPath()).getAbsolutePath();
+					cachedDefaultGradleHome = new File(fileURL.getPath()).getAbsolutePath();
 				}
 			}
 		} catch (IOException e) {
@@ -289,8 +293,8 @@ public class GradlePlugin extends AbstractUIPlugin {
 		}
 		
 		//check if gradle scripts are executable
-		makeGradleScriptsExecutable(gradleHomeString);
-		return gradleHomeString;
+		makeGradleScriptsExecutable(cachedDefaultGradleHome);
+		return cachedDefaultGradleHome;
 	}
 
 	/**
@@ -315,18 +319,10 @@ public class GradlePlugin extends AbstractUIPlugin {
 	}
 
 	public String getInitScriptFolder(){
-		String scriptFolderPath  = "scripts";
-		URL entryURL = getBundle().getEntry("scripts");
-		try{
-			URL fileURL = FileLocator.toFileURL(entryURL);
-			scriptFolderPath = new File(fileURL.getPath()).getAbsolutePath();
-		} catch (IOException e) {
-			GradlePlugin.log(newErrorStatus("unable to locate init script folder", e));
-		}
-		return scriptFolderPath;
+		return(getDefaultGradleHome() + File.separator + "initScripts" + File.separator);
 	}
 
 	public String getInitScript(String script) {
-		return getInitScriptFolder() + File.separator + script;
+		return getInitScriptFolder() + File.separator + "initScripts" + File.separator + script;
 	}
 }
