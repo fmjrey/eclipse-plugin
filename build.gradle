@@ -51,10 +51,33 @@ buildscript {
 	} 
 }
 
+subprojects {
+   
+	repositories {
+		add(new org.apache.ivy.plugins.resolver.FileSystemResolver()) {
+	        name = 'repo'
+	        addIvyPattern "$eclipseLocation/plugins/[organisation].[module]-ivy-[revision].xml"
+	        addArtifactPattern "$eclipseLocation/plugins/[organisation].[module]_[revision](-[classifier]).[ext]"
+	        descriptor = 'optional'
+	        checkmodified = true
+		}
+	}
+	
+ 	group = 'org.gradle'
+	apply plugin:'java'
+    plugins.withType(JavaPlugin).whenPluginAdded {
+        sourceCompatibility = 1.5
+        targetCompatibility = 1.5
+    }
+
+    version = this.version
+}
 
 if(!hasProperty('eclipseLocation')){
 	throw (new InvalidUserDataException("The property 'eclipseLocation' not set. Use -PeclipseLocation=/Path/to/eclipse"))
 }
+
+
 
 configure(FeaturePde){	
 	def projectDir = getRootDir()

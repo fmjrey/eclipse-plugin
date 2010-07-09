@@ -1,0 +1,29 @@
+apply plugin:'java'
+
+dependencies{
+	compile gradleApi()
+	compile "org.eclipse:ui:3.+"
+	compile "org.eclipse:swt:3.+"
+	
+	//@TODO avoid this platform dependency:
+	compile "org.eclipse:swt.cocoa.macosx:3.+"
+	compile "org.eclipse:jface:3.+"
+	compile "org.eclipse:jface.text:3.+"
+	compile "org.eclipse:core.runtime:3.+"
+	compile "org.eclipse:core.resources:3.+"
+	compile "org.eclipse:core.commands:3.+"
+	compile "org.eclipse:core.jobs:3.+"
+	compile "org.eclipse:core.variables:3.+"
+	compile "org.eclipse:osgi:3.+"
+	compile "org.eclipse:equinox.common:3.+"
+	compile "org.eclipse:equinox.preferences:3.+"
+	compile "org.eclipse:debug.ui:3.+"
+	compile "org.eclipse:debug.core:3.+"
+	compile "org.eclipse:text:3.+"
+	compile "org.eclipse:ui.workbench:3.+"
+	compile "org.eclipse:ui.editors:3.+"
+	compile "org.eclipse:ui.console:3.+"
+	compile "org.eclipse:ui.externaltools:3.+"
+	compile "org.eclipse:jdt.launching:3.+"
+	compile "com.ibm:icu:4.+"
+}
