@@ -30,16 +30,19 @@ public class GradleBackgroundRequestExecutionInteraction extends GradleProcessEx
 	}
 
 	public void reportExecutionStarted() {
-		beginTask("Calculating Gradle tasks", 10);
+		beginTask("Initialize Gradle", 10);
 	}
 
 	public void reportLiveOutput(String arg0) {
+		System.out.println("reportLiveOutput -- " + arg0);
 	}
 
 	public void reportTaskComplete(String arg0, float arg1) {
+		System.out.println("reportTaskComplete -- " + arg0);
 	}
 
 	public void reportTaskStarted(String arg0, float arg1) {
+		System.out.println("reportTaskStarted -- " + arg0);
 	}
 
 	public void reportNumberOfTasksToExecute(int taskCount) {

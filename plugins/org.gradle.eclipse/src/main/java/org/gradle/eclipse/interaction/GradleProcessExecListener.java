@@ -25,7 +25,7 @@ import org.gradle.foundation.ipc.gradle.ExecuteGradleCommandServerProtocol.Execu
 public abstract class GradleProcessExecListener implements
 		ExecutionInteraction {
 
-	private IProgressMonitor monitor;
+	protected IProgressMonitor monitor;
 	protected boolean finished = false;
 	protected Throwable throwable = null;
 	protected boolean successful;

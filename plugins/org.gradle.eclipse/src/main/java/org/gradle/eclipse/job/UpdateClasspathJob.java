@@ -9,6 +9,7 @@ import org.gradle.eclipse.GradlePlugin;
 import org.gradle.eclipse.interaction.GradleProcessExecListener;
 import org.gradle.eclipse.interaction.GradleProcessResult;
 import org.gradle.eclipse.interaction.GradleBackgroundRequestExecutionInteraction;
+import org.gradle.eclipse.interaction.UpdateEclipseCpInteraction;
 import org.gradle.gradleplugin.foundation.GradlePluginLord;
 import org.gradle.gradleplugin.foundation.request.ExecutionRequest;
 import org.gradle.gradleplugin.foundation.request.RefreshTaskListRequest;
@@ -36,7 +37,7 @@ public class UpdateClasspathJob extends BackgroundBuildJob {
 	}
 
 	private IStatus refreshClasspath(IProgressMonitor monitor) {
-		final GradleProcessExecListener executionlistener = new GradleBackgroundRequestExecutionInteraction(monitor);
+		final GradleProcessExecListener executionlistener = new UpdateEclipseCpInteraction(monitor);
 		
 		pluginLord.startExecutionQueue();
 		final GradleProcessResult processResult = new GradleProcessResult();
