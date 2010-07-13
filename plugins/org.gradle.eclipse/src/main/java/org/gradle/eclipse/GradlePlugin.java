@@ -323,6 +323,6 @@ public class GradlePlugin extends AbstractUIPlugin {
 	}
 
 	public String getInitScript(String script) {
-		return getInitScriptFolder() + File.separator + "initScripts" + File.separator + script;
+		return getInitScriptFolder() + script;
 	}
 }
