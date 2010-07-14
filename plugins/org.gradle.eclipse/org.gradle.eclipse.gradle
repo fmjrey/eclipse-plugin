@@ -4,10 +4,6 @@ dependencies{
 	compile gradleApi()
 	compile "org.eclipse:ui:3.+"
 	compile "org.eclipse:swt:3.+"
-	
-	//@TODO avoid this platform dependency:
-	//compile "org.eclipse:swt.cocoa.macosx:3.+"
-	compile "org.eclipse:swt.gtk.linux.x86_64:3.+"
 	compile "org.eclipse:jface:3.+"
 	compile "org.eclipse:jface.text:3.+"
 	compile "org.eclipse:core.runtime:3.+"
@@ -27,4 +23,13 @@ dependencies{
 	compile "org.eclipse:ui.externaltools:3.+"
 	compile "org.eclipse:jdt.launching:3.+"
 	compile "com.ibm:icu:4.+"
+	
+	//platform dependent swt library
+	//TODO add windows support and consider different os arch types
+	String buildOS = System.getProperty("os.name")
+	switch(buildOS){
+	    case ~/Mac OS X/: compile("org.eclipse:swt.cocoa.macosx.x86_64:3.+");break;
+	    case ~/Windows.*/: println "Windows support not done yet here";break;
+	    case ~/Linux/: compile("org.eclipse:swt.gtk.linux.x86_64:3.+");break;
+	}
 }
