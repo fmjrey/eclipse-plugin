@@ -119,8 +119,12 @@ String createBundleClasspath(FileTree zipContent){
 repositories {
 	// get the latest available gradle snapshot. Are files resolved via URLResolver are cacheable?
 	add(new org.apache.ivy.plugins.resolver.URLResolver()) {
-		name = 'gradle-snapshots'
+		name = 'gradle-dists'
 		addArtifactPattern 'http://dist.codehaus.org/([organization]/)[artifact](-[revision])(-[classifier]).[ext]'
+	}
+	add(new org.apache.ivy.plugins.resolver.URLResolver()) {
+		name = 'gradle-snapshots'
+		addArtifactPattern 'http://snapshots.dist.codehaus.org/([organization]/)[artifact](-[revision])(-[classifier]).[ext]'
 	}
 }
 
@@ -129,7 +133,7 @@ configurations {
 }
 
 dependencies{
-	workspaceSetup "gradle:gradle:0.9-preview-3:bin@zip"
+	workspaceSetup "gradle:gradle:0.9-rc-1:bin@zip"
 }
 
 //tasks

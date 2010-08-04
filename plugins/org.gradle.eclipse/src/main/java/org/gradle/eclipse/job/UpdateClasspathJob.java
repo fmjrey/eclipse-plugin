@@ -8,7 +8,6 @@ import org.eclipse.core.runtime.Status;
 import org.gradle.eclipse.GradlePlugin;
 import org.gradle.eclipse.interaction.GradleProcessExecListener;
 import org.gradle.eclipse.interaction.GradleProcessResult;
-import org.gradle.eclipse.interaction.GradleBackgroundRequestExecutionInteraction;
 import org.gradle.eclipse.interaction.UpdateEclipseCpInteraction;
 import org.gradle.gradleplugin.foundation.GradlePluginLord;
 import org.gradle.gradleplugin.foundation.request.ExecutionRequest;
@@ -17,7 +16,7 @@ import org.gradle.gradleplugin.foundation.request.Request;
 
 public class UpdateClasspathJob extends BackgroundBuildJob {
 
-	private static final String ECLIPSE_CP_TASK = "eclipseCp";
+	private static final String ECLIPSE_CP_TASK = "eclipseClasspath";
 	private static final String ECLIPSE_INIT_SCRIPT = "eclipse.gradle";
 	
 	private final GradlePluginLord pluginLord;

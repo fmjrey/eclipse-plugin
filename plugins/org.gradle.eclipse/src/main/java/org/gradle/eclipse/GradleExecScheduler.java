@@ -133,7 +133,7 @@ public class GradleExecScheduler {
 											   "buildPath: [ " + buildfilePath + "] cannot be resolved")
 				));
 		}
-		
+
 		//buildfile could have any custom name so use -b flag
 		commandLine.append(" -b ").append(buildFile.getName());
 		gradlePluginLord.setCurrentDirectory(buildFile.getParentFile());
