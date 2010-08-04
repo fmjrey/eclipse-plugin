@@ -103,7 +103,7 @@ String createBundleClasspath(FileTree zipContent){
 	
 	StringBuffer buffer = new StringBuffer();
 	zipContent.visit {node ->
-		if(node.toString().endsWith("jar") && !node.toString().contains("/plugins/")){
+		if(node.toString().endsWith("jar")){
 			def filepath = node.relativePath.pathString
 			def bundleClasspathEntry = filepath.substring(filepath.indexOf('/') + 1)
 			buffer.append(bundleClasspathEntry).append(BUNDLE_LIB_SEPERATOR)
