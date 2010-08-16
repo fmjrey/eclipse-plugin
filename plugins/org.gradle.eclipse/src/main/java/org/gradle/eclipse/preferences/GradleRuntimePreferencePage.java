@@ -49,6 +49,7 @@ public class GradleRuntimePreferencePage extends FieldEditorPreferencePage imple
 	private ColorEditor consoleColorEditor;
 	private BooleanFieldEditor useGradleFieldEditor;
 	private DirectoryFieldEditor gradleHomeDirectoryFieldEditor;
+	private DirectoryFieldEditor gradleCacheDirEditor;
 	
 	// Array containing the message to display, the preference key, and the 
 	// default value (initialized in storeInitialValues()) for each color preference
@@ -105,7 +106,10 @@ public class GradleRuntimePreferencePage extends FieldEditorPreferencePage imple
 		FieldEditor editor = new StringFieldEditor(IGradlePreferenceConstants.GRADLE_FIND_BUILD_FILE_NAMES, GradlePreferencesMessages.GradleRuntimePreferencePage_BuildFileName, getFieldEditorParent());
 		addField(editor);
 		
-	
+		gradleCacheDirEditor = new DirectoryFieldEditor(IGradlePreferenceConstants.GRADLE_CACHE, GradlePreferencesMessages.GradleRuntimePreferencePage_GRADLE_CACHE_DIR, getFieldEditorParent());
+		gradleCacheDirEditor.setEmptyStringAllowed(false);
+		addField(gradleCacheDirEditor);
+		
 		useGradleFieldEditor = new BooleanFieldEditor(IGradlePreferenceConstants.USE_SPECIFIC_GRADLE_HOME, GradlePreferencesMessages.GradleRuntimePreferencePage_USE_MANUEL_GRADLE_HOME, getFieldEditorParent());
 		useGradleFieldEditor.setPropertyChangeListener(this);
 		addField(useGradleFieldEditor);

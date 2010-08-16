@@ -43,6 +43,8 @@ public class GradlePreferenceInitializer extends AbstractPreferenceInitializer {
 	private void initGradleRuntimePreferences(IPreferenceStore prefs) {
 		prefs.setDefault(IGradlePreferenceConstants.USE_SPECIFIC_GRADLE_HOME, false);
 		prefs.setDefault(IGradlePreferenceConstants.GRADLE_FIND_BUILD_FILE_NAMES, "build.gradle");
+		prefs.setDefault(IGradlePreferenceConstants.GRADLE_CACHE, getDefaultGradleCache());
+
 		PreferenceConverter.setDefault(prefs, IGradlePreferenceConstants.CONSOLE_ERROR_COLOR, new RGB(255, 0, 0)); // red - exactly the same as debug Console
 		PreferenceConverter.setDefault(prefs, IGradlePreferenceConstants.CONSOLE_WARNING_COLOR, new RGB(250, 100, 0)); // orange
 		PreferenceConverter.setDefault(prefs, IGradlePreferenceConstants.CONSOLE_INFO_COLOR, new RGB(0, 0, 255)); // blue
@@ -51,6 +53,18 @@ public class GradlePreferenceInitializer extends AbstractPreferenceInitializer {
 
 	}
 	
+	/**
+	 * loads the default gradle cache directory (USER_HOME/.gradle/cache/
+	 * */
+	private String getDefaultGradleCache() {
+		StringBuffer cacheBuffer = new StringBuffer(System.getProperty("user.home"));
+		cacheBuffer.append(System.getProperty("file.separator"))
+				   .append(".gradle")
+				   .append(System.getProperty("file.separator"))
+				   .append("cache");
+		return cacheBuffer.toString();
+	}
+
 	/**
 	 * Returns the absolute path of the default gradle.home to use for the build.
 	 * 

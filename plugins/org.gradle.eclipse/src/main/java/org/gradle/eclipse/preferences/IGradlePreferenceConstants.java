@@ -39,6 +39,5 @@ public interface IGradlePreferenceConstants {
 	public static final String CONSOLE_DEBUG_COLOR = "org.gradle.eclipse.ui.debugColor"; //$NON-NLS-1$	
 	
 	public static final String GRADLE_ERROR_DIALOG = "GRADLE_ERROR_DIALOG";
-	
-
+	public static final String GRADLE_CACHE = "GRADLE_CACHE";
 }
