@@ -199,7 +199,11 @@
 			   </visibility>
 		</objectContribution>
    </extension>
-   
+   <extension point="org.eclipse.jdt.core.classpathVariableInitializer">
+    <classpathVariableInitializer 
+      variable="GRADLE_HOME"
+      class="org.gradle.eclipse.cache.GradleCacheDirectoryInitializer"/>
+  </extension>
    
    
    <!--
