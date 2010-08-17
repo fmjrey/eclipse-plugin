@@ -24,7 +24,9 @@ import java.util.Locale;
 import java.util.Set;
 
 import org.eclipse.core.runtime.FileLocator;
+import org.eclipse.core.runtime.IAdapterFactory;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.preference.PreferenceConverter;
@@ -36,6 +38,8 @@ import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.gradle.eclipse.preferences.IGradlePreferenceConstants;
 import org.gradle.eclipse.util.ColorManager;
+import org.gradle.foundation.ProjectView;
+import org.gradle.foundation.TaskView;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.packageadmin.ExportedPackage;
@@ -65,6 +69,9 @@ public class GradlePlugin extends AbstractUIPlugin {
 	private static GradlePlugin plugin;
 	
 	private String cachedDefaultGradleHome = null;
+	
+	IAdapterFactory gradleAdapterFactory = new GradleAdapterFactory();
+
 
 	/**
 	 * Returns the standard display to be used. The method first checks, if
@@ -103,6 +110,11 @@ public class GradlePlugin extends AbstractUIPlugin {
 		super.start(context);
 //		initializeGradleEditor();
 		plugin = this;
+		
+		//register adapters
+		Platform.getAdapterManager().registerAdapters(gradleAdapterFactory, ProjectView.class);
+		Platform.getAdapterManager().registerAdapters(gradleAdapterFactory, TaskView.class);
+	
 	}
 
 	/*
@@ -110,6 +122,8 @@ public class GradlePlugin extends AbstractUIPlugin {
 	 * @see org.eclipse.ui.plugin.AbstractUIPlugin#stop(org.osgi.framework.BundleContext)
 	 */
 	public void stop(BundleContext context) throws Exception {
+		//register adapters
+		Platform.getAdapterManager().unregisterAdapters(gradleAdapterFactory);
 		plugin = null;
 		super.stop(context);
 	}
