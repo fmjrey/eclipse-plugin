@@ -18,7 +18,7 @@ public class GradlePreferencesMessages extends NLS {
 	public static String GradleRuntimePreferencePage_BuildFileName;
 
 	public static String GradleRuntimePreferencePage_Enter;
-	public static String GradleRuntimePreferencePage_GradleErrorDialog_Label;
+//	public static String GradleRuntimePreferencePage_GradleErrorDialog_Label;
 
 	public static String GradlePreferencePage_Gradle_Color_Options__6;
 

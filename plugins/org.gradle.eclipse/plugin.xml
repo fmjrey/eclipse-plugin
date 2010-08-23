@@ -204,6 +204,15 @@
       variable="GRADLE_HOME"
       class="org.gradle.eclipse.cache.GradleCacheDirectoryInitializer"/>
   </extension>
+  <extension point="org.eclipse.ui.propertyPages">
+      <page id="org.gradle.eclipse.preferences.GradleProjectPreferencePage"
+            class="org.gradle.eclipse.preferences.GradleRuntimePreferencePage"
+            name="Gradle"
+            objectClass="org.eclipse.core.resources.IProject"
+            adaptable="true">
+         <filter name="nature" value="org.gradle.eclipse.gradleNature"/>
+      </page>
+   </extension>
    
    
    <!--

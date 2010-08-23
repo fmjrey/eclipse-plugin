@@ -44,6 +44,7 @@ public class UpdateClasspathAction implements IObjectActionDelegate {
         	   IFile file = project.getFile("build.gradle");
         	   
   				try {
+  					
 					GradleExecScheduler.getInstance().updateProjectClasspath(file.getLocationURI().getPath(), project);
 				} catch (CoreException e) {
 					// TODO Auto-generated catch block

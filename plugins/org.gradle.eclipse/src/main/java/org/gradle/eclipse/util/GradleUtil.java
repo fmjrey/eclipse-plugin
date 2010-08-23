@@ -130,7 +130,6 @@ public class GradleUtil {
 			throws CoreException {
 		final IProjectDescription description = project.getDescription();
 		final String[] ids = description.getNatureIds();
-
 		final String[] newIds = new String[ids == null ? 1 : ids.length + 1];
 		newIds[0] = GradleNature.GRADLE_NATURE;
 		if (ids != null) {

@@ -27,6 +27,7 @@ import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.core.variables.VariablesPlugin;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.swt.widgets.Display;
 import org.gradle.eclipse.job.ConfigurationBasedBuildJob;
 import org.gradle.eclipse.job.RefreshTaskJob;
@@ -105,8 +106,12 @@ public class GradleExecScheduler {
 	}
 	
 	public void updateProjectClasspath(String absoluteBuildPath, IProject projectToUpdate) throws CoreException{
+		updateProjectClasspath(GradlePlugin.getDefault().getPreferenceStore(), absoluteBuildPath, projectToUpdate);
+	}
+	
+	public void updateProjectClasspath(IPreferenceStore store, String absoluteBuildPath, IProject projectToUpdate) throws CoreException{
 		final GradlePluginLord gradlePluginLord = new GradlePluginLord();
-		gradlePluginLord.setGradleHomeDirectory(new File(GradlePlugin.getPlugin().getGradleHome()));
+		gradlePluginLord.setGradleHomeDirectory(new File(GradlePlugin.getPlugin().getGradleHome(store)));
 
 		File buildFile = new File(VariablesPlugin.getDefault().getStringVariableManager().performStringSubstitution(absoluteBuildPath));
 		if(buildFile==null || !buildFile.exists()){

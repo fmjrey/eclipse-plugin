@@ -19,6 +19,8 @@ package org.gradle.eclipse.actions;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+
+import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IAdaptable;
@@ -27,6 +29,7 @@ import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ui.IObjectActionDelegate;
 import org.eclipse.ui.IWorkbenchPart;
+import org.gradle.eclipse.preferences.ProjectPropertyHandler;
 import org.gradle.eclipse.util.GradleUtil;
 
 /**
@@ -41,8 +44,9 @@ public class AddGradleNatureAction implements IObjectActionDelegate {
         
         if (currSelected != null && currSelected.size() > 0) {
            for (IProject project : currSelected) {
-           	try {
+        	   try {
 					GradleUtil.addGradleNature(project);
+					resolveProjectBuildFile(project);
 				} catch (CoreException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -51,7 +55,13 @@ public class AddGradleNatureAction implements IObjectActionDelegate {
         }
     }
 
-    /**
+    private void resolveProjectBuildFile(IProject project) {
+    	String projectBuildFile = ProjectPropertyHandler.getPreference(project, "project.build.file");
+    	
+    	System.out.println("project build file: " + projectBuildFile);
+    }
+
+	/**
      * @see IObjectActionDelegate#selectionChanged
      */
     public void selectionChanged(final IAction action, final ISelection selection) {

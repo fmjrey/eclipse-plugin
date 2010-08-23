@@ -27,6 +27,7 @@ import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.PreferenceConverter;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.graphics.Color;
@@ -243,29 +244,6 @@ public class GradlePlugin extends AbstractUIPlugin {
 		return highest;
 	}
 	
-	/**
-	 * @return the absolute path to the defaultGradleHome directory
-	 * */
-	public String getGradleHome(){
-		//is gradlehome configured?
-		boolean useCustomGradleHome = getPlugin().getPreferenceStore().getBoolean(IGradlePreferenceConstants.USE_SPECIFIC_GRADLE_HOME);
-		if(useCustomGradleHome){
-			String gradleHome = getPlugin().getPreferenceStore().getString(IGradlePreferenceConstants.MANUELL_GRADLE_HOME);
-			if(gradleHome!=null && !gradleHome.trim().equals("")){
-				return gradleHome;
-			}else{
-				GradlePlugin.getStandardDisplay().asyncExec
-			    (new Runnable() {
-			        public void run() {
-			            MessageDialog.openWarning(GradlePlugin.getStandardDisplay().getActiveShell(),
-			            			GradleMessages.INVALID_GRADLE_HOME,GradleMessages.INVALID_GRADLE_HOME);
-			        }
-			    });
-			}
-		}		
-		return getDefaultGradleHome();
-	}
-	
 	
 	private String getDefaultGradleHome() {
 		//use default gradlehome 
@@ -324,5 +302,35 @@ public class GradlePlugin extends AbstractUIPlugin {
 
 	public String getInitScript(String script) {
 		return getInitScriptFolder() + script;
+	}
+
+	/**
+	 * @return the absolute path to the workspace wide defaultGradleHomde
+	 * */
+	public String getGradleHome(){
+		return getGradleHome(getDefault().getPreferenceStore());
+	}
+	
+	/**
+	 * @return the absolute path to the gradleHome stored in {@link IPreferenceStore}
+	 * */
+	public String getGradleHome(IPreferenceStore store) {
+		//is gradlehome configured?
+		boolean useCustomGradleHome = store.getBoolean(IGradlePreferenceConstants.USE_SPECIFIC_GRADLE_HOME);
+		if(useCustomGradleHome){
+			String gradleHome = store.getString(IGradlePreferenceConstants.MANUELL_GRADLE_HOME);
+			if(gradleHome!=null && !gradleHome.trim().equals("")){
+				return gradleHome;
+			}else{
+				GradlePlugin.getStandardDisplay().asyncExec
+			    (new Runnable() {
+			        public void run() {
+			            MessageDialog.openWarning(GradlePlugin.getStandardDisplay().getActiveShell(),
+			            			GradleMessages.INVALID_GRADLE_HOME,GradleMessages.INVALID_GRADLE_HOME);
+			        }
+			    });
+			}
+		}		
+		return getDefaultGradleHome();
 	}
 }

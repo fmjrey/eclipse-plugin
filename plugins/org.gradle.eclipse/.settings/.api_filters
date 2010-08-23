@@ -9,4 +9,12 @@
             </message_arguments>
         </filter>
     </resource>
+    <resource path="src/main/java/org/gradle/eclipse/preferences/PropertyStore.java" type="org.gradle.eclipse.preferences.PropertyStore">
+        <filter id="571473929">
+            <message_arguments>
+                <message_argument value="PreferenceStore"/>
+                <message_argument value="PropertyStore"/>
+            </message_arguments>
+        </filter>
+    </resource>
 </component>
