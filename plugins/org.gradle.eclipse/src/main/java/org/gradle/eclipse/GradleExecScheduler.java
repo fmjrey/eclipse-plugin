@@ -127,6 +127,9 @@ public class GradleExecScheduler {
 		job.schedule(); // start as soon as possible
 	}
 	
+	/**
+	 * @noreference This method is not intended to be referenced by clients.
+	 */
 	public void startGradleBuildRun(final ILaunchConfiguration configuration, final StringBuffer commandLine, final GradleProcess gradleProcess) throws CoreException{
 		final GradlePluginLord gradlePluginLord = new GradlePluginLord();
 		gradlePluginLord.setGradleHomeDirectory(new File(GradlePlugin.getPlugin().getGradleHome()));

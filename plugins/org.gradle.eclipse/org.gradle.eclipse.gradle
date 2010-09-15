@@ -22,6 +22,7 @@ dependencies{
 	compile "org.eclipse:ui.console:3.+"
 	compile "org.eclipse:ui.externaltools:3.+"
 	compile "org.eclipse:jdt.launching:3.+"
+	compile "org.eclipse:jdt.core:3.+"
 	compile "com.ibm:icu:4.+"
 	
 	//platform dependent swt library

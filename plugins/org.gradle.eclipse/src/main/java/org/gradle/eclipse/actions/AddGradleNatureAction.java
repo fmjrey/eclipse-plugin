@@ -29,7 +29,6 @@ import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ui.IObjectActionDelegate;
 import org.eclipse.ui.IWorkbenchPart;
-import org.gradle.eclipse.preferences.ProjectPropertyHandler;
 import org.gradle.eclipse.util.GradleUtil;
 
 /**
@@ -56,9 +55,8 @@ public class AddGradleNatureAction implements IObjectActionDelegate {
     }
 
     private void resolveProjectBuildFile(IProject project) {
-    	String projectBuildFile = ProjectPropertyHandler.getPreference(project, "project.build.file");
+    	//String projectBuildFile = ProjectPropertyHandler.getPreference(project, "project.build.file");
     	
-    	System.out.println("project build file: " + projectBuildFile);
     }
 
 	/**

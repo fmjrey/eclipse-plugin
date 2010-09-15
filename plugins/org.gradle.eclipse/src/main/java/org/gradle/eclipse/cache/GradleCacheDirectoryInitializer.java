@@ -32,7 +32,6 @@ import org.gradle.eclipse.preferences.IGradlePreferenceConstants;
  * */
 public class GradleCacheDirectoryInitializer extends org.eclipse.jdt.core.ClasspathVariableInitializer{
 
-	@Override
 	public void initialize(String variable) {
 		IPreferenceStore preferenceStore = GradlePlugin.getPlugin().getPreferenceStore();
 		String gradleCache = preferenceStore.getString(IGradlePreferenceConstants.GRADLE_CACHE);
