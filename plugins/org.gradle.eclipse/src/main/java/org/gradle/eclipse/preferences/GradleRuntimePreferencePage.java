@@ -132,7 +132,7 @@ public class GradleRuntimePreferencePage extends FieldEditorOverlayPage
 				GradlePreferencesMessages.GradleRuntimePreferencePage_GRADLE_CACHE_DIR,
 				getFieldEditorParent());
 		gradleCacheDirEditor.setEmptyStringAllowed(isPropertyPage());
-		gradleCacheDirEditor.setErrorMessage("GRADLE_CACHE must not be empty!");
+//		gradleCacheDirEditor.setErrorMessage("GRADLE_CACHE must not be empty!");
 //		gradleCacheDirEditor.setValidateStrategy(StringFieldEditor.VALIDATE_ON_KEY_STROKE);
 //
 		gradleCacheDirEditor.setPropertyChangeListener(this);
@@ -171,7 +171,7 @@ public class GradleRuntimePreferencePage extends FieldEditorOverlayPage
 		if(!isPropertyPage()){
 			createColorComposite();
 		}
-
+		
 		checkState();
 	}
 
