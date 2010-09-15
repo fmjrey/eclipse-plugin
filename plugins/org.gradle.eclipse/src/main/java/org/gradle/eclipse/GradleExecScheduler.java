@@ -18,7 +18,6 @@ package org.gradle.eclipse;
 import java.io.File;
 import java.util.List;
 
-import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IStatus;
@@ -62,10 +61,10 @@ public class GradleExecScheduler {
 	}
 
 	// these both methods should be moved to BuildInformationCache
-	public List<ProjectView> getProjectViews(IFile buildFile){
-		String absolutePath = new File(buildFile.getFullPath().toString()).getAbsolutePath();	
-		return getProjectViews(absolutePath);
-	}
+//	public List<ProjectView> getProjectViews(IFile buildFile){
+//		String absolutePath = new File(buildFile.getFullPath().toString()).getAbsolutePath();	
+//		return getProjectViews(absolutePath);
+//	}
 	
 	public List<ProjectView> getProjectViews(String absolutePath) {
 		if(cache.get(absolutePath)==null){
@@ -105,10 +104,10 @@ public class GradleExecScheduler {
 		}
 	}
 	
-	public void updateProjectClasspath(String absoluteBuildPath, IProject projectToUpdate) throws CoreException{
-		updateProjectClasspath(GradlePlugin.getDefault().getPreferenceStore(), absoluteBuildPath, projectToUpdate);
-	}
-	
+	/**
+	 * 
+	 * @param projectToUpdate the project which classpath will be updated
+	 * */
 	public void updateProjectClasspath(IPreferenceStore store, String absoluteBuildPath, IProject projectToUpdate) throws CoreException{
 		final GradlePluginLord gradlePluginLord = new GradlePluginLord();
 		gradlePluginLord.setGradleHomeDirectory(new File(GradlePlugin.getPlugin().getGradleHome(store)));

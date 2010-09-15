@@ -26,7 +26,8 @@ public interface IGradlePreferenceConstants {
 	public static final String MANUELL_GRADLE_HOME = GradlePlugin.PLUGIN_ID + "_MAN_GRADLE_HOME";
 	public static final String GRADLE_FIND_BUILD_FILE_NAMES = "_GRADLE_FIND_BUILD_FILE_NAMES"; //$NON-NLS-1$
 	public static final String USE_SPECIFIC_GRADLE_HOME = "_USE_SPECIFIC_GRADLE_HOME";
-	
+	public static final String USE_PROJECT_SETTINGS = "_USE_PROJECT_SETTINGS";
+
 	/**
 	 * The symbolic names for colors for displaying the content in the Console
 	 * @see org.eclipse.jface.resource.ColorRegistry

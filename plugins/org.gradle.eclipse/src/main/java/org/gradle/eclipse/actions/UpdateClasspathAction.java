@@ -22,14 +22,21 @@ import java.util.List;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.ProjectScope;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IAdaptable;
+import org.eclipse.core.runtime.QualifiedName;
 import org.eclipse.jface.action.IAction;
+import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ui.IObjectActionDelegate;
 import org.eclipse.ui.IWorkbenchPart;
+import org.eclipse.ui.preferences.ScopedPreferenceStore;
 import org.gradle.eclipse.GradleExecScheduler;
+import org.gradle.eclipse.GradlePlugin;
+import org.gradle.eclipse.preferences.IGradlePreferenceConstants;
 
 /**
  * UpdateClasspathAction is responsible for updating the projects classpath using gradle eclipseCp task.
@@ -44,8 +51,16 @@ public class UpdateClasspathAction implements IObjectActionDelegate {
         	   IFile file = project.getFile("build.gradle");
         	   
   				try {
-  					
-					GradleExecScheduler.getInstance().updateProjectClasspath(file.getLocationURI().getPath(), project);
+  					//check whether to use project specific settings or not
+  					String use = project.getPersistentProperty(new QualifiedName("org.gradle.eclipse.preferences.GradleRuntimePreferencePage", IGradlePreferenceConstants.USE_PROJECT_SETTINGS));
+  					IPreferenceStore store = null;
+  					if ("true".equals(use)){
+  						store = new ScopedPreferenceStore(new ProjectScope(project), "org.gradle.eclipse.preferences");  	  					
+  					}else{
+  						store = GradlePlugin.getDefault().getPreferenceStore();
+  					}
+					
+  					GradleExecScheduler.getInstance().updateProjectClasspath(store, file.getLocationURI().getPath(), project);
 				} catch (CoreException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();

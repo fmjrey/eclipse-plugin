@@ -48,7 +48,6 @@ public abstract class FieldEditorOverlayPage extends FieldEditorPreferencePage
 
 	private List<FieldEditor> editors = new ArrayList<FieldEditor>();
 
-	public static final String USEPROJECTSETTINGS = "useProjectSettings";
 	protected Button useWorkspaceSettingsButton, useProjectSettingsButton,
 			configureButton;
 	
@@ -113,8 +112,7 @@ public abstract class FieldEditorOverlayPage extends FieldEditorPreferencePage
 		});
 		try {
 			String use = ((IResource) element)
-					.getPersistentProperty(new QualifiedName(pageId,
-							USEPROJECTSETTINGS));
+					.getPersistentProperty(new QualifiedName(pageId, IGradlePreferenceConstants.USE_PROJECT_SETTINGS));
 			if ("true".equals(use)) {
 				useProjectSettingsButton.setSelection(true);
 				configureButton.setEnabled(false);
@@ -220,7 +218,7 @@ public abstract class FieldEditorOverlayPage extends FieldEditorPreferencePage
 				String value = (useProjectSettingsButton.getSelection()) ? "true"
 						: "false";
 				resource.setPersistentProperty(new QualifiedName(pageId,
-						USEPROJECTSETTINGS), value);
+						IGradlePreferenceConstants.USE_PROJECT_SETTINGS), value);
 			} catch (CoreException e) {
 			}
 		}
