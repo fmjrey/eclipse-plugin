@@ -48,7 +48,7 @@ public class GradleRuntimePreferencePage extends FieldEditorOverlayPage
 	private static final String PAGE_ID = "org.gradle.eclipse.preferences.GradleRuntimePreferencePage";
 	private List consoleColorList;
 	private ColorEditor consoleColorEditor;
-	private BooleanFieldEditor useGradleFieldEditor;
+	private BooleanFieldEditor useCustomGradleHomeFieldEditor;
 	private DirectoryFieldEditor gradleHomeDirectoryFieldEditor;
 	private DirectoryFieldEditor gradleCacheDirEditor;
 
@@ -131,22 +131,28 @@ public class GradleRuntimePreferencePage extends FieldEditorOverlayPage
 				IGradlePreferenceConstants.GRADLE_CACHE,
 				GradlePreferencesMessages.GradleRuntimePreferencePage_GRADLE_CACHE_DIR,
 				getFieldEditorParent());
-		gradleCacheDirEditor.setEmptyStringAllowed(false);
+		gradleCacheDirEditor.setEmptyStringAllowed(isPropertyPage());
+		gradleCacheDirEditor.setErrorMessage("GRADLE_CACHE must not be empty!");
+//		gradleCacheDirEditor.setValidateStrategy(StringFieldEditor.VALIDATE_ON_KEY_STROKE);
+//
+		gradleCacheDirEditor.setPropertyChangeListener(this);
+
 		addField(gradleCacheDirEditor);
 
-		useGradleFieldEditor = new BooleanFieldEditor(
+		useCustomGradleHomeFieldEditor = new BooleanFieldEditor(
 				IGradlePreferenceConstants.USE_SPECIFIC_GRADLE_HOME,
 				GradlePreferencesMessages.GradleRuntimePreferencePage_USE_MANUEL_GRADLE_HOME,
 				getFieldEditorParent());
-		useGradleFieldEditor.setPropertyChangeListener(this);
-		addField(useGradleFieldEditor);
+		useCustomGradleHomeFieldEditor.setPropertyChangeListener(this);
+		addField(useCustomGradleHomeFieldEditor);
 
 		gradleHomeDirectoryFieldEditor = new DirectoryFieldEditor(
 				IGradlePreferenceConstants.MANUELL_GRADLE_HOME,
 				GradlePreferencesMessages.GradleRuntimePreferencePage_GradleHome_Label,
 				getFieldEditorParent());
-		gradleHomeDirectoryFieldEditor
-				.setValidateStrategy(StringFieldEditor.VALIDATE_ON_KEY_STROKE);
+		gradleHomeDirectoryFieldEditor.setValidateStrategy(StringFieldEditor.VALIDATE_ON_KEY_STROKE);
+		gradleHomeDirectoryFieldEditor.setErrorMessage("GRADLE_HOME must not be empty!");
+
 		gradleHomeDirectoryFieldEditor.setPropertyChangeListener(this);
 		addField(gradleHomeDirectoryFieldEditor);
 
@@ -296,17 +302,22 @@ public class GradleRuntimePreferencePage extends FieldEditorOverlayPage
 	 * .jface.util.PropertyChangeEvent)
 	 */
 	public void propertyChange(PropertyChangeEvent event) {
-		if (event.getSource().equals(useGradleFieldEditor)) {
+		if (event.getSource().equals(useCustomGradleHomeFieldEditor)) {
 			boolean useCustomHome = (Boolean) event.getNewValue();
-			String stringValue = gradleHomeDirectoryFieldEditor.getStringValue();
-			gradleHomeDirectoryFieldEditor.setEnabled(useCustomHome, getFieldEditorParent());
-			gradleHomeDirectoryFieldEditor.setEmptyStringAllowed(!useCustomHome);
-			gradleHomeDirectoryFieldEditor.setStringValue(stringValue);
-			gradleHomeDirectoryFieldEditor.load();
-			gradleHomeDirectoryFieldEditor.setStringValue(stringValue);
+			revalidateFields(useCustomHome);
 		}
 		checkState();
 	}
+
+	private void revalidateFields(boolean useCustomHome) {
+		String stringValue = gradleHomeDirectoryFieldEditor.getStringValue();
+		gradleHomeDirectoryFieldEditor.setEnabled(useCustomHome, getFieldEditorParent());
+		gradleHomeDirectoryFieldEditor.setEmptyStringAllowed(!useCustomHome);
+		gradleHomeDirectoryFieldEditor.setStringValue(stringValue);
+		gradleHomeDirectoryFieldEditor.load();
+		gradleHomeDirectoryFieldEditor.setStringValue(stringValue);
+	}
+	
 
 	/*
 	 * (non-Javadoc)
@@ -317,4 +328,20 @@ public class GradleRuntimePreferencePage extends FieldEditorOverlayPage
 	protected String getPageId() {
 		return PAGE_ID;
 	}
+	
+	
+	protected void updateFieldEditors(boolean enabled) {
+		super.updateFieldEditors(enabled);
+		revalidateFields(useCustomGradleHomeFieldEditor.getBooleanValue() && enabled);
+		gradleCacheDirEditor.setEmptyStringAllowed(isPropertyPage() && !enabled);
+//		gradleHomeDirectoryFieldEditor.setEnabled(, getFieldEditorParent());
+		checkState();
+	}
+	
+	protected void performDefaults() {
+		super.performDefaults();
+		revalidateFields(useCustomGradleHomeFieldEditor.getBooleanValue());
+		checkState();
+    }
+	 
 }

@@ -49,7 +49,7 @@ public abstract class FieldEditorOverlayPage extends FieldEditorPreferencePage
 	private List<FieldEditor> editors = new ArrayList<FieldEditor>();
 
 	public static final String USEPROJECTSETTINGS = "useProjectSettings";
-	private Button useWorkspaceSettingsButton, useProjectSettingsButton,
+	protected Button useWorkspaceSettingsButton, useProjectSettingsButton,
 			configureButton;
 	
 	public FieldEditorOverlayPage(int style) {
