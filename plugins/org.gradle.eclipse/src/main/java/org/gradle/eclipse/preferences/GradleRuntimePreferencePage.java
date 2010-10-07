@@ -48,6 +48,7 @@ public class GradleRuntimePreferencePage extends FieldEditorOverlayPage
 	private static final String PAGE_ID = "org.gradle.eclipse.preferences.GradleRuntimePreferencePage";
 	private List consoleColorList;
 	private ColorEditor consoleColorEditor;
+	private BooleanFieldEditor useCustomCacheFieldEditor;
 	private BooleanFieldEditor useCustomGradleHomeFieldEditor;
 	private DirectoryFieldEditor gradleHomeDirectoryFieldEditor;
 	private DirectoryFieldEditor gradleCacheDirEditor;
@@ -127,14 +128,19 @@ public class GradleRuntimePreferencePage extends FieldEditorOverlayPage
 			addField(editor);
 		}
 		
+		useCustomCacheFieldEditor = new BooleanFieldEditor(
+				IGradlePreferenceConstants.USE_SPECIFIC_GRADLE_CACHE,
+				GradlePreferencesMessages.GradleRuntimePreferencePage_USE_MANUEL_GRADLE_CACHE,
+				getFieldEditorParent());
+		useCustomCacheFieldEditor.setPropertyChangeListener(this);
+		addField(useCustomCacheFieldEditor);
+		
 		gradleCacheDirEditor = new DirectoryFieldEditor(
 				IGradlePreferenceConstants.GRADLE_CACHE,
 				GradlePreferencesMessages.GradleRuntimePreferencePage_GRADLE_CACHE_DIR,
 				getFieldEditorParent());
 		gradleCacheDirEditor.setEmptyStringAllowed(isPropertyPage());
-//		gradleCacheDirEditor.setErrorMessage("GRADLE_CACHE must not be empty!");
-//		gradleCacheDirEditor.setValidateStrategy(StringFieldEditor.VALIDATE_ON_KEY_STROKE);
-//
+
 		gradleCacheDirEditor.setPropertyChangeListener(this);
 
 		addField(gradleCacheDirEditor);
@@ -156,14 +162,23 @@ public class GradleRuntimePreferencePage extends FieldEditorOverlayPage
 		gradleHomeDirectoryFieldEditor.setPropertyChangeListener(this);
 		addField(gradleHomeDirectoryFieldEditor);
 
-		boolean useCustom = getPreferenceStore().getBoolean(
+		boolean useCustomHome = getPreferenceStore().getBoolean(
 				IGradlePreferenceConstants.USE_SPECIFIC_GRADLE_HOME);
-		if (useCustom) {
+		if (useCustomHome) {
 			gradleHomeDirectoryFieldEditor.setEmptyStringAllowed(false);
 			gradleHomeDirectoryFieldEditor.setEnabled(true,	getFieldEditorParent());
 		} else {
 			gradleHomeDirectoryFieldEditor.setEmptyStringAllowed(true);
 			gradleHomeDirectoryFieldEditor.setEnabled(false, getFieldEditorParent());
+		}
+		boolean useCustomCache = getPreferenceStore().getBoolean(
+				IGradlePreferenceConstants.USE_SPECIFIC_GRADLE_CACHE);
+		if (useCustomCache) {
+			gradleCacheDirEditor.setEmptyStringAllowed(false);
+			gradleCacheDirEditor.setEnabled(true, getFieldEditorParent());
+		} else {
+			gradleCacheDirEditor.setEmptyStringAllowed(true);
+			gradleCacheDirEditor.setEnabled(false, getFieldEditorParent());
 		}
 		createSpace();
 		getPreferenceStore().addPropertyChangeListener(this);
@@ -304,21 +319,31 @@ public class GradleRuntimePreferencePage extends FieldEditorOverlayPage
 	public void propertyChange(PropertyChangeEvent event) {
 		if (event.getSource().equals(useCustomGradleHomeFieldEditor)) {
 			boolean useCustomHome = (Boolean) event.getNewValue();
-			revalidateFields(useCustomHome);
+			revalidateFields(useCustomHome, useCustomCacheFieldEditor.getBooleanValue());
+		}else if(event.getSource().equals(useCustomCacheFieldEditor)) {
+			boolean useCustomCache = (Boolean) event.getNewValue();
+			revalidateFields(useCustomGradleHomeFieldEditor.getBooleanValue(), useCustomCache);
 		}
 		checkState();
 	}
 
-	private void revalidateFields(boolean useCustomHome) {
-		String stringValue = gradleHomeDirectoryFieldEditor.getStringValue();
+	private void revalidateFields(boolean useCustomHome, boolean useCustomCache) {
+		String gradleHomeValue = gradleHomeDirectoryFieldEditor.getStringValue();
 		gradleHomeDirectoryFieldEditor.setEnabled(useCustomHome, getFieldEditorParent());
 		gradleHomeDirectoryFieldEditor.setEmptyStringAllowed(!useCustomHome);
-		gradleHomeDirectoryFieldEditor.setStringValue(stringValue);
+		gradleHomeDirectoryFieldEditor.setStringValue(gradleHomeValue);
 		gradleHomeDirectoryFieldEditor.load();
-		gradleHomeDirectoryFieldEditor.setStringValue(stringValue);
+		gradleHomeDirectoryFieldEditor.setStringValue(gradleHomeValue);
+		
+
+		String gradleCacheValue = gradleCacheDirEditor.getStringValue();
+		gradleCacheDirEditor.setEnabled(useCustomCache, getFieldEditorParent());
+		gradleCacheDirEditor.setEmptyStringAllowed(!useCustomCache);
+		gradleCacheDirEditor.setStringValue(gradleCacheValue);
+		gradleCacheDirEditor.load();
+		gradleCacheDirEditor.setStringValue(gradleCacheValue);
 	}
 	
-
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -332,15 +357,14 @@ public class GradleRuntimePreferencePage extends FieldEditorOverlayPage
 	
 	protected void updateFieldEditors(boolean enabled) {
 		super.updateFieldEditors(enabled);
-		revalidateFields(useCustomGradleHomeFieldEditor.getBooleanValue() && enabled);
+		revalidateFields(useCustomGradleHomeFieldEditor.getBooleanValue() && enabled, useCustomCacheFieldEditor.getBooleanValue() && enabled);
 		gradleCacheDirEditor.setEmptyStringAllowed(isPropertyPage() && !enabled);
-//		gradleHomeDirectoryFieldEditor.setEnabled(, getFieldEditorParent());
 		checkState();
 	}
 	
 	protected void performDefaults() {
 		super.performDefaults();
-		revalidateFields(useCustomGradleHomeFieldEditor.getBooleanValue());
+		revalidateFields(useCustomGradleHomeFieldEditor.getBooleanValue(), useCustomCacheFieldEditor.getBooleanValue());
 		checkState();
     }
 	 

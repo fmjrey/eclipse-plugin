@@ -4,14 +4,24 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.core.resources.IProject;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.jface.preference.IPreferenceStore;
+import org.gradle.eclipse.preferences.IGradlePreferenceConstants;
+import org.gradle.eclipse.util.GradleUtil;
+
 public abstract class BackgroundBuildJob extends AbstractGradleJob{
 
 	private String initScriptPath = null;
 	private String buildFilePath;
+	protected final IProject project;
+
 	private List<String> tasks = new ArrayList<String>();
 	
-	public BackgroundBuildJob(String name, String absoluteBuildFilePath){
+	public BackgroundBuildJob(IProject project, String name, String absoluteBuildFilePath){
 		super(name);
+		this.project = project;
 		this.buildFilePath = absoluteBuildFilePath;
 	}
 
@@ -58,4 +68,33 @@ public abstract class BackgroundBuildJob extends AbstractGradleJob{
 			commandLineArgs.append(task);
 		}
 	}
+	
+	protected void configureGradleCache(StringBuffer commandLineArgs) {
+		IPreferenceStore store = GradleUtil.getStoreForProject(project);
+		boolean useCustomCache = store.getBoolean(IGradlePreferenceConstants.USE_SPECIFIC_GRADLE_CACHE);
+		if(useCustomCache){
+			String gradleCache = store.getString(IGradlePreferenceConstants.GRADLE_CACHE);
+			commandLineArgs.append(" -g ");
+			commandLineArgs.append(gradleCache);
+		}
+	}
+
+	@Override
+	protected IStatus run(IProgressMonitor monitor) {
+		StringBuffer setupGradle = setupGradleCommandLine();
+		return runGradleJob(monitor, setupGradle);
+	}
+	
+	abstract IStatus runGradleJob(IProgressMonitor monitor, StringBuffer commandLine);
+	
+	private StringBuffer setupGradleCommandLine() {
+		StringBuffer commandLineArgs = new StringBuffer();
+		configureBuildFilePath(commandLineArgs);
+		configureInitScript(commandLineArgs);
+		configureTasks(commandLineArgs);
+		return commandLineArgs;
+	}
+
+
+
 }

@@ -5,6 +5,8 @@ import org.eclipse.osgi.util.NLS;
 public class GradlePreferencesMessages extends NLS {
 	private static final String BUNDLE_NAME = "org.gradle.eclipse.preferences.GradlePreferencesMessages";//$NON-NLS-1$
 
+	public static String GradleRuntimePreferencePage_USE_MANUEL_GRADLE_CACHE = null;
+
 	public static String GradleRuntimePreferencePage_GRADLE_CACHE_DIR;
 
 	public static String GradleRuntimePreferencePage_GradleHome_Not_Set_ERROR;
@@ -18,7 +20,6 @@ public class GradlePreferencesMessages extends NLS {
 	public static String GradleRuntimePreferencePage_BuildFileName;
 
 	public static String GradleRuntimePreferencePage_Enter;
-//	public static String GradleRuntimePreferencePage_GradleErrorDialog_Label;
 
 	public static String GradlePreferencePage_Gradle_Color_Options__6;
 

@@ -20,49 +20,41 @@ public class UpdateClasspathJob extends BackgroundBuildJob {
 	private static final String ECLIPSE_INIT_SCRIPT = "eclipse.gradle";
 	
 	private final GradlePluginLord pluginLord;
-	private final IProject projectToRefresh;
-
+	
 	public UpdateClasspathJob(IProject project, GradlePluginLord gradlePluginLord, String absoluteBuildFilePath) {
-		super("Update Classpath", absoluteBuildFilePath);
+		super(project, "Update Classpath", absoluteBuildFilePath);
 		setInitScriptPath(GradlePlugin.getDefault().getInitScript(ECLIPSE_INIT_SCRIPT));
 		getTasks().add(ECLIPSE_CP_TASK);
 		this.pluginLord = gradlePluginLord;
-		this.projectToRefresh = project;
 	}
+
 
 	@Override
-	protected IStatus run(IProgressMonitor monitor) {
-		return refreshClasspath(monitor);
-	}
-
-	private IStatus refreshClasspath(IProgressMonitor monitor) {
+	IStatus runGradleJob(IProgressMonitor monitor, StringBuffer commandLineArgs) {
 		final GradleProcessExecListener executionlistener = new UpdateEclipseCpInteraction(monitor);
 		
 		pluginLord.startExecutionQueue();
 		final GradleProcessResult processResult = new GradleProcessResult();
 
-		StringBuffer commandLineArgs = new StringBuffer();
-		configureBuildFilePath(commandLineArgs);
-		configureInitScript(commandLineArgs);
-		configureTasks(commandLineArgs);
-		
+				
 		GradlePluginLord.RequestObserver observer = new GradlePluginLord.RequestObserver() {
 	           
-			public void executionRequestAdded( ExecutionRequest request )
-	           {
+			public void executionRequestAdded( ExecutionRequest request ){
 	              request.setExecutionInteraction( executionlistener );
-	           }
-	           public void refreshRequestAdded( RefreshTaskListRequest request ) { 
-	           }
-	           public void aboutToExecuteRequest( Request request ) { 
-	           }
+	        }
+	        
+			public void refreshRequestAdded( RefreshTaskListRequest request ) { 
+	        }
+	        
+			public void aboutToExecuteRequest( Request request ) { 
+	        }
 
-	           public void requestExecutionComplete( Request request, int result, String output ) {
-	        	   processResult.setComplete(true);
-	        	   processResult.setResult(result);
-	        	   processResult.setOutput(output);
-	           }
-	        };
+	        public void requestExecutionComplete( Request request, int result, String output ) {
+	        	processResult.setComplete(true);
+	        	processResult.setResult(result);
+	        	processResult.setOutput(output);
+	        }
+	    };
 
 	    pluginLord.addRequestObserver(observer, false);
 	    pluginLord.addExecutionRequestToQueue(commandLineArgs.toString(), getBuildFileName() + UpdateClasspathJob.ECLIPSE_CP_TASK);
@@ -83,9 +75,9 @@ public class UpdateClasspathJob extends BackgroundBuildJob {
 			return new Status(IStatus.ERROR, GradlePlugin.PLUGIN_ID, processResult.getOutput(), executionlistener.getThrowable());
 		}
 		try {
-			projectToRefresh.refreshLocal(IProject.DEPTH_INFINITE, monitor);
+			project.refreshLocal(IProject.DEPTH_INFINITE, monitor);
 		} catch (CoreException coreException) {
-			return new Status(IStatus.ERROR, GradlePlugin.PLUGIN_ID, "Exception while refreshing project " + projectToRefresh.getName(), coreException);
+			return new Status(IStatus.ERROR, GradlePlugin.PLUGIN_ID, "Exception while refreshing project " + project.getName(), coreException);
 		}
 		return Status.OK_STATUS;	
 	}

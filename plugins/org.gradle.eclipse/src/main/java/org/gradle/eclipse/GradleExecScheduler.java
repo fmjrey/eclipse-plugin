@@ -60,12 +60,6 @@ public class GradleExecScheduler {
 		this.cache = new BuildInformationCache();
 	}
 
-	// these both methods should be moved to BuildInformationCache
-//	public List<ProjectView> getProjectViews(IFile buildFile){
-//		String absolutePath = new File(buildFile.getFullPath().toString()).getAbsolutePath();	
-//		return getProjectViews(absolutePath);
-//	}
-	
 	public List<ProjectView> getProjectViews(String absolutePath) {
 		if(cache.get(absolutePath)==null){
 			refreshTaskView(absolutePath, true);

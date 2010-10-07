@@ -24,11 +24,17 @@ import java.util.StringTokenizer;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IProjectDescription;
+import org.eclipse.core.resources.ProjectScope;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.core.runtime.QualifiedName;
+import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.ui.preferences.ScopedPreferenceStore;
 import org.gradle.eclipse.GradleNature;
+import org.gradle.eclipse.GradlePlugin;
+import org.gradle.eclipse.preferences.IGradlePreferenceConstants;
 
 /**
  * @author Rene Groeschke
@@ -150,4 +156,28 @@ public class GradleUtil {
 		description.setNatureIds(ids.toArray(new String[ids.size()]));
 		project.setDescription(description, null);
 	}
+	
+	/**
+	 * @param project
+	 * @return
+	 * @throws CoreException
+	 */
+	public static IPreferenceStore getStoreForProject(IProject project){
+		//check whether to use project specific settings or not
+		IPreferenceStore store = null;
+		try{
+			String use = project.getPersistentProperty(new QualifiedName("org.gradle.eclipse.preferences.GradleRuntimePreferencePage", IGradlePreferenceConstants.USE_PROJECT_SETTINGS));
+			if ("true".equals(use)){
+				store = new ScopedPreferenceStore(new ProjectScope(project), "org.gradle.eclipse.preferences");  	  					
+			}else{
+				store = GradlePlugin.getDefault().getPreferenceStore();
+			}
+		}catch(CoreException ce){
+			GradlePlugin.log(ce);
+			store = GradlePlugin.getDefault().getPreferenceStore();
+		}
+		return store;
+	}
+
+
 }

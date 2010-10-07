@@ -41,4 +41,5 @@ public interface IGradlePreferenceConstants {
 	
 	public static final String GRADLE_ERROR_DIALOG = "GRADLE_ERROR_DIALOG";
 	public static final String GRADLE_CACHE = "GRADLE_CACHE";
+	public static final String USE_SPECIFIC_GRADLE_CACHE = "_USE_SPECIFIC_GRADLE_HOME";
 }

@@ -69,8 +69,6 @@ public class BuildInformationCache{
 	 * and up to date
 	 * */
 	public List<ProjectView> get(String buildFilePath) {
-		long start = System.currentTimeMillis();
-
 		String storedMd5 = pathToMd5Map.get(buildFilePath);
 		if(storedMd5==null){
 			//no tasks calculated for buildfile
@@ -81,19 +79,15 @@ public class BuildInformationCache{
 			//remove stored values
 			pathToMd5Map.remove(buildFilePath);
 			internalMd5Cache.remove(storedMd5);
-			long end = System.currentTimeMillis();
-			System.out.println("build info cache get with wrong md5 takes: " + Long.toString(end-start) + " millis");
 			return null;
 		}
-		long end = System.currentTimeMillis();
-		System.out.println("build info cache get with valid md5 takes: " + Long.toString(end-start) + " millis");
 		return internalMd5Cache.get(storedMd5);
 	}
 
 	/**
 	 * calculates a md5 hash of a file.
-	 * */
-	private String calculateMd5StringForFile(String buildFilePath) {
+	 * */ 
+	String calculateMd5StringForFile(String buildFilePath) {
 		InputStream is = null;				
 		String output = null;
 		try {

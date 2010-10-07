@@ -20,7 +20,6 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IAdaptable;
@@ -55,7 +54,6 @@ public class AddGradleNatureAction implements IObjectActionDelegate {
     }
 
     private void resolveProjectBuildFile(IProject project) {
-    	//String projectBuildFile = ProjectPropertyHandler.getPreference(project, "project.build.file");
     	
     }
 
