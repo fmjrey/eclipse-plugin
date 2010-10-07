@@ -53,14 +53,11 @@ public class BuildInformationCache{
 	 * buildFilePath the absolute path to a build file
 	 * */
 	public void put(String buildFilePath, List<ProjectView> projects) {
-		long start = System.currentTimeMillis();
 		String md5String = calculateMd5StringForFile(buildFilePath);
 		if(md5String!=null){
 			internalMd5Cache.put(md5String, projects);
 			pathToMd5Map.put(buildFilePath, md5String);
 		}
-		long end = System.currentTimeMillis();
-		System.out.println("build info cache put takes: " + Long.toString(end-start) + "millis");
 	}
 
 
