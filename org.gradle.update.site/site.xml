@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<site>
+   <feature url="features/org.gradle.eclipse.feature_0.9.0.qualifier.jar" id="org.gradle.eclipse.feature" version="0.9.0.qualifier">
+      <category name="gradle"/>
+   </feature>
+   <category-def name="gradle" label="Gradle Eclipse Plugin"/>
+</site>
