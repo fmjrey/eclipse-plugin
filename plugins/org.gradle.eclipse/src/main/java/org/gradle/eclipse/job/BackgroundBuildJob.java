@@ -78,6 +78,15 @@ public abstract class BackgroundBuildJob extends AbstractGradleJob{
 			commandLineArgs.append(gradleCache);
 		}
 	}
+	
+	protected void configureAdditionalCmdParams(StringBuffer commandLineArgs) {
+		IPreferenceStore store = GradleUtil.getStoreForProject(project);
+		String customCmdParams = store.getString(IGradlePreferenceConstants.ADDITIONAL_COMMANDLINE_PARAMS);
+		if(customCmdParams!= null && customCmdParams.isEmpty()){
+			commandLineArgs.append(" ")
+						   .append(customCmdParams);
+		}
+	}
 
 	@Override
 	protected IStatus run(IProgressMonitor monitor) {
@@ -92,6 +101,7 @@ public abstract class BackgroundBuildJob extends AbstractGradleJob{
 		configureBuildFilePath(commandLineArgs);
 		configureInitScript(commandLineArgs);
 		configureTasks(commandLineArgs);
+		configureAdditionalCmdParams(commandLineArgs);
 		return commandLineArgs;
 	}
 
