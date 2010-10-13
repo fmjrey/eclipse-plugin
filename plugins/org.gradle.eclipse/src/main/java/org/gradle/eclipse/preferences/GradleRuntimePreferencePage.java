@@ -67,6 +67,7 @@ public class GradleRuntimePreferencePage extends FieldEditorOverlayPage
 					IGradlePreferenceConstants.CONSOLE_VERBOSE_COLOR, null },
 			{ GradlePreferencesMessages.GradlePreferencePage_Deb_ug__6,
 					IGradlePreferenceConstants.CONSOLE_DEBUG_COLOR, null }, };
+	private StringFieldEditor gradleCmdParamsEditor;
 
 	/**
 	 * Create the Gradle page.
@@ -180,6 +181,11 @@ public class GradleRuntimePreferencePage extends FieldEditorOverlayPage
 			gradleCacheDirEditor.setEmptyStringAllowed(true);
 			gradleCacheDirEditor.setEnabled(false, getFieldEditorParent());
 		}
+		gradleCmdParamsEditor = new StringFieldEditor(
+				IGradlePreferenceConstants.ADDITIONAL_COMMANDLINE_PARAMS,
+				GradlePreferencesMessages.GradleRuntimePreferencePage_ADDITIONAL_COMMANDLINE_PARAMS,
+				getFieldEditorParent());
+		addField(gradleCmdParamsEditor);
 		createSpace();
 		getPreferenceStore().addPropertyChangeListener(this);
 

@@ -212,10 +212,9 @@ public class GradlePlugin extends AbstractUIPlugin {
 	 * @return the bundle that represents the highest version of <code>org.codehaus.gradle</code> or <code>null</code>
 	 * if there are other providers for the <code>org.gradle</code> packages.
 	 */
-	@SuppressWarnings("unchecked")
 	Bundle findHighestGradleVersion(ExportedPackage[] packages) {
 		Bundle bundle = null;
-		Set bundles = new HashSet();
+		Set<Bundle> bundles = new HashSet<Bundle>();
 		for (int i = 0; i < packages.length; i++) {
 			bundle = packages[i].getExportingBundle();
 			if(bundle == null) {

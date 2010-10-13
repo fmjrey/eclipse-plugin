@@ -17,11 +17,6 @@ package org.gradle.eclipse.adapters;
 
 import org.eclipse.core.runtime.IAdapterFactory;
 
-//import org.codehaus.groovy.ast.ClassNode;
-//import org.codehaus.groovy.eclipse.core.GroovyCore;
-//import org.eclipse.core.runtime.IAdapterFactory;
-//import org.eclipse.ui.IFileEditorInput;
-
 /**
  * This class will take an FileEditorInput and adapt it to varios Groovy friendly 
  * classes / interfaces.
@@ -38,8 +33,8 @@ public class GradleIFileEditorInputAdapterFactory implements IAdapterFactory {
 	/* (non-Javadoc)
 	 * @see org.eclipse.core.runtime.IAdapterFactory#getAdapter(java.lang.Object, java.lang.Class)
 	 */
-	@SuppressWarnings("unchecked")
-    public Object getAdapter(Object adaptableObject, Class adapterType) {
+    @SuppressWarnings("rawtypes")
+	public Object getAdapter(Object adaptableObject, Class adapterType) {
 		Object returnValue = null ; 
 		
 //		if( (ClassNode.class.equals(adapterType) || ClassNode[].class.equals(adapterType) ) && adaptableObject instanceof IFileEditorInput) {
@@ -58,7 +53,7 @@ public class GradleIFileEditorInputAdapterFactory implements IAdapterFactory {
 	/* (non-Javadoc)
 	 * @see org.eclipse.core.runtime.IAdapterFactory#getAdapterList()
 	 */
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings("rawtypes")
     public Class[] getAdapterList() {
 		return classes ; 
 	}
