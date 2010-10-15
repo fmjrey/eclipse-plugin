@@ -16,101 +16,95 @@
 
 package org.gradle.eclipse.job;
 
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
-import org.eclipse.debug.core.ILaunchConfiguration;
-import org.gradle.eclipse.GradlePlugin;
 import org.gradle.eclipse.interaction.GradleBuildExecutionInteraction;
 import org.gradle.eclipse.interaction.GradleProcessExecListener;
-import org.gradle.eclipse.interaction.GradleProcessResult;
 import org.gradle.eclipse.launchConfigurations.GradleProcess;
 import org.gradle.gradleplugin.foundation.GradlePluginLord;
-import org.gradle.gradleplugin.foundation.request.ExecutionRequest;
-import org.gradle.gradleplugin.foundation.request.RefreshTaskListRequest;
-import org.gradle.gradleplugin.foundation.request.Request;
 
 
 public class ConfigurationBasedBuildJob extends AbstractGradleJob {
 
-	private final GradlePluginLord pluginLord;
 	private final GradleProcess process;
-	private final ILaunchConfiguration configuration;
-	private final String commandLine;
+	
+	public ConfigurationBasedBuildJob(IProject project, GradlePluginLord gradlePluginLord,
+			String absoluteBuildFilePath, GradleProcess process) {
 
-	public ConfigurationBasedBuildJob(GradlePluginLord gradlePluginLord, GradleProcess process,
-			ILaunchConfiguration configuration, String commandLine) {
-
-		super("Running Gradle Build...");
-		this.pluginLord = gradlePluginLord;
+		super(project, gradlePluginLord, "Running Gradle Build...", absoluteBuildFilePath);
 		this.process = process;
-		this.configuration = configuration;
-		this.commandLine = commandLine;
 	}
 
+//	@Override
+//	protected IStatus runGradleJob(IProgressMonitor monitor) {
+//
+//		final GradleProcessExecListener executionlistener = 
+//		
+//		pluginLord.startExecutionQueue();
+//
+//		final GradleProcessResult processResult = new GradleProcessResult();
+//		// /
+//		GradlePluginLord.RequestObserver observer = new GradlePluginLord.RequestObserver() {
+//			public void executionRequestAdded(ExecutionRequest request) {
+//				request.setExecutionInteraction(executionlistener);
+//			}
+//
+//			public void refreshRequestAdded(RefreshTaskListRequest request) {
+//
+//			}
+//
+//			public void aboutToExecuteRequest(Request request) {
+//
+//			}
+//
+//			/**
+//			 * -1 indicates failing process creation
+//			 * 1 indicates process started correctly but build failed
+//			 * */
+//			public void requestExecutionComplete(Request request, int result,
+//					String output) {
+//				processResult.setComplete(true);
+//				processResult.setResult(result);
+//				processResult.setOutput(output);
+//			}
+//		};
+//
+//		// add the observer before we add the request due to timing issues.
+//		// It's possible for it to completely execute before we return from
+//		// addExecutionRequestToQueue.
+//
+//		pluginLord.addRequestObserver(observer, false);
+//		pluginLord.addExecutionRequestToQueue(commandLine, configuration.getName());
+//
+//		// gradlePluginLord.addExecutionRequestToQueue(commandLine,
+//		// executionlistener);
+//		// keep job open til listener reports gradle has finished
+//		while (!processResult.isComplete()) {
+//			try {
+//				Thread.sleep(100);
+//			} catch (InterruptedException e) {
+//				return new Status(IStatus.WARNING, GradlePlugin.PLUGIN_ID,
+//						"Error while running Gradle Tasks", e);
+//			}
+//		}
+//
+//		if (executionlistener.getThrowable() != null) {
+//			return new Status(IStatus.WARNING, GradlePlugin.PLUGIN_ID,
+//					"Error while running Gradle Tasks", executionlistener
+//							.getThrowable());
+//		}
+//		
+//		if(!executionlistener.isSuccessful() && processResult.getResult()==-1) {
+//			return new Status(IStatus.ERROR, GradlePlugin.PLUGIN_ID,
+//					"Error while starting Gradle Process. Please check that GRADLE_HOME is defined correctly in your preferences!", executionlistener
+//							.getThrowable());
+//		}
+//		return Status.OK_STATUS;
+//	}
+
 	@Override
-	protected IStatus run(IProgressMonitor monitor) {
-
-		final GradleProcessExecListener executionlistener = new GradleBuildExecutionInteraction(
-				monitor, process);
-		pluginLord.startExecutionQueue();
-
-		final GradleProcessResult processResult = new GradleProcessResult();
-		// /
-		GradlePluginLord.RequestObserver observer = new GradlePluginLord.RequestObserver() {
-			public void executionRequestAdded(ExecutionRequest request) {
-				request.setExecutionInteraction(executionlistener);
-			}
-
-			public void refreshRequestAdded(RefreshTaskListRequest request) {
-
-			}
-
-			public void aboutToExecuteRequest(Request request) {
-
-			}
-
-			/**
-			 * -1 indicates failing process creation
-			 * 1 indicates process started correctly but build failed
-			 * */
-			public void requestExecutionComplete(Request request, int result,
-					String output) {
-				processResult.setComplete(true);
-				processResult.setResult(result);
-			}
-		};
-
-		// add the observer before we add the request due to timing issues.
-		// It's possible for it to completely execute before we return from
-		// addExecutionRequestToQueue.
-
-		pluginLord.addRequestObserver(observer, false);
-		pluginLord.addExecutionRequestToQueue(commandLine, configuration.getName());
-
-		// gradlePluginLord.addExecutionRequestToQueue(commandLine,
-		// executionlistener);
-		// keep job open til listener reports gradle has finished
-		while (!processResult.isComplete()) {
-			try {
-				Thread.sleep(100);
-			} catch (InterruptedException e) {
-				return new Status(IStatus.WARNING, GradlePlugin.PLUGIN_ID,
-						"Error while running Gradle Tasks", e);
-			}
-		}
-
-		if (executionlistener.getThrowable() != null) {
-			return new Status(IStatus.WARNING, GradlePlugin.PLUGIN_ID,
-					"Error while running Gradle Tasks", executionlistener
-							.getThrowable());
-		}
-		
-		if(!executionlistener.isSuccessful() && processResult.getResult()==-1) {
-			return new Status(IStatus.ERROR, GradlePlugin.PLUGIN_ID,
-					"Error while starting Gradle Process. Please check that GRADLE_HOME is defined correctly in your preferences!", executionlistener
-							.getThrowable());
-		}
-		return Status.OK_STATUS;
+	protected GradleProcessExecListener createExecutionListener(
+			IProgressMonitor monitor) {
+		return new GradleBuildExecutionInteraction(monitor, process);
 	}
 }

@@ -15,22 +15,17 @@
  */
 package org.gradle.eclipse.job;
 
-import java.io.File;
 import java.util.List;
 
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.gradle.eclipse.BuildInformationCache;
-import org.gradle.eclipse.GradlePlugin;
-import org.gradle.eclipse.interaction.GradleProcessExecListener;
-import org.gradle.eclipse.interaction.GradleProcessResult;
 import org.gradle.eclipse.interaction.GradleBackgroundRequestExecutionInteraction;
+import org.gradle.eclipse.interaction.GradleProcessExecListener;
 import org.gradle.foundation.ProjectView;
 import org.gradle.gradleplugin.foundation.GradlePluginLord;
-import org.gradle.gradleplugin.foundation.request.ExecutionRequest;
-import org.gradle.gradleplugin.foundation.request.RefreshTaskListRequest;
-import org.gradle.gradleplugin.foundation.request.Request;
 
 
 /**
@@ -40,79 +35,21 @@ import org.gradle.gradleplugin.foundation.request.Request;
  */
 public class RefreshTaskJob extends AbstractGradleJob{
 
-	private final GradlePluginLord pluginLord;
-	private final String buildFilePath;
 	private BuildInformationCache cache;
 
-	public RefreshTaskJob(GradlePluginLord gradlePluginLord, String buildFilePath, BuildInformationCache cache) {
-		super("Calculating Gradle Tasks...");
-		this.pluginLord = gradlePluginLord;
-		this.buildFilePath = buildFilePath;
+	public RefreshTaskJob(IProject project, String absoluteBuildFilePath, GradlePluginLord gradlePluginLord, BuildInformationCache cache) {
+		super(project, gradlePluginLord, "Calculating Gradle Tasks of " + project.getName(), absoluteBuildFilePath, true);
 		this.cache = cache;
+	}
+	
+	protected IStatus afterGradleExecutionHook(){
+		List<ProjectView> projects = pluginLord.getProjects();
+		cache.put(buildFilePath, projects);
+		return Status.OK_STATUS;
 	}
 
 	@Override
-	protected IStatus run(IProgressMonitor monitor) {
-		return calculateTasks(monitor);
-	}
-	
-	/**
-	 * to be able to run the refresh job in sync without job api extract the code to a package wide visible void
-	 * */
-	
-	public IStatus calculateTasks(IProgressMonitor monitor){
-		final GradleProcessExecListener executionlistener = new GradleBackgroundRequestExecutionInteraction(monitor);
-		
-		pluginLord.startExecutionQueue();
-		final GradleProcessResult processResult = new GradleProcessResult();
-
-		StringBuffer additionalCmdLine = new StringBuffer(" -b ");
-		additionalCmdLine.append(getBuildFileName());
-		
-		GradlePluginLord.RequestObserver observer = new GradlePluginLord.RequestObserver() {
-	           
-			public void executionRequestAdded( ExecutionRequest request )
-	           {
-	              request.setExecutionInteraction( executionlistener );
-	           }
-	           public void refreshRequestAdded( RefreshTaskListRequest request ) { 
-	           }
-	           public void aboutToExecuteRequest( Request request ) { 
-	           }
-
-	           public void requestExecutionComplete( Request request, int result, String output ) {
-	        	   processResult.setComplete(true);
-	        	   processResult.setResult(result);
-	        	   processResult.setOutput(output);
-	           }
-	        };
-
-	    pluginLord.addRequestObserver(observer, false);
-	    pluginLord.addRefreshRequestToQueue(additionalCmdLine.toString());
-		//keep job open til listener reports gradle has finished
-		while(!processResult.isComplete()){
-			try {
-				Thread.sleep(100);
-			} catch (InterruptedException e) {
-				return new Status(IStatus.WARNING, GradlePlugin.PLUGIN_ID, "Error while recalculating Gradle Tasks", e);
-			}
-		}
-				
-		if( processResult.getResult() == -1) {
-			return new Status(IStatus.ERROR, GradlePlugin.PLUGIN_ID,
-					"Error while starting Gradle Process. Please check that GRADLE_HOME is defined correctly in your preferences!", executionlistener
-							.getThrowable());
-		}else if( processResult.getResult() == 1) {
-			return new Status(IStatus.ERROR, GradlePlugin.PLUGIN_ID, processResult.getOutput(), executionlistener.getThrowable());
-		}
-		
-		List<ProjectView> projects = pluginLord.getProjects();
-		cache.put(buildFilePath, projects);
-
-		return Status.OK_STATUS;	
-	}
-
-	private String getBuildFileName() {
-		return new File(buildFilePath).getName();
+	protected GradleProcessExecListener createExecutionListener(IProgressMonitor monitor) {
+		 return new GradleBackgroundRequestExecutionInteraction(monitor);
 	}
 }

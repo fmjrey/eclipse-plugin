@@ -52,7 +52,6 @@ public class GradleBuildExecutionInteraction extends GradleProcessExecListener{
 	public void reportExecutionStarted() {
 		beginTask("Executing Gradle Build", HUNDRED_PERCENT);
 		worked(START_PERCENTAGE);
-		System.out.println("reportExecutionStarted");
 	}
 
 	/**
@@ -84,7 +83,6 @@ public class GradleBuildExecutionInteraction extends GradleProcessExecListener{
 
 
 	public void reportNumberOfTasksToExecute(int tasksCount) {
-		System.out.println("reportNumberOfTasks: " + Integer.toString(tasksCount) + "  " + calculateTaskPercentage(tasksCount));
 		this.percentProTask = calculateTaskPercentage(tasksCount);
 	}
 	

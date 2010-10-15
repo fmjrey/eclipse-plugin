@@ -24,6 +24,7 @@ import java.util.StringTokenizer;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IProjectDescription;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ProjectScope;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
@@ -79,7 +80,7 @@ public class GradleUtil {
 	 * @return file or <code>null</code>
 	 * @see org.eclipse.core.resources.IWorkspaceRoot#findFilesForLocation(IPath)
 	 */
-	public static IFile getFileForLocation(String path, File buildFileParent) {
+	public static IFile getFileForLocation(String path) {
 		if (path == null) {
 			return null;
 		}
@@ -178,6 +179,4 @@ public class GradleUtil {
 		}
 		return store;
 	}
-
-
 }

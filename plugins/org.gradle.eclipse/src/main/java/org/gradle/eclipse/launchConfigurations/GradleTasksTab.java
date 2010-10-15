@@ -232,7 +232,7 @@ public class GradleTasksTab extends AbstractLaunchConfigurationTab implements IP
 					if(!variableString.isEmpty()){
 						ISchedulingRule rule= null;
 						final String absFileLocation = VariablesPlugin.getDefault().getStringVariableManager().performStringSubstitution(variableString);
-						rule = GradleUtil.getFileForLocation(absFileLocation, null);
+						rule = GradleUtil.getFileForLocation(absFileLocation);
 						
 						IRunnableWithProgress operation= new IRunnableWithProgress() {
 							public void run(IProgressMonitor monitor) {
