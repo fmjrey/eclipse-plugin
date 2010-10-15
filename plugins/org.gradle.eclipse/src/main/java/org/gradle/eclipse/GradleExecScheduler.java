@@ -30,7 +30,9 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.core.variables.VariablesPlugin;
 import org.eclipse.debug.core.ILaunchConfiguration;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.swt.widgets.Display;
 import org.gradle.eclipse.job.ConfigurationBasedBuildJob;
 import org.gradle.eclipse.job.RefreshTaskJob;
 import org.gradle.eclipse.job.UpdateClasspathJob;
@@ -83,28 +85,33 @@ public class GradleExecScheduler {
 				IWorkspace workspace = ResourcesPlugin.getWorkspace();
 				IWorkspaceRoot root = workspace.getRoot();
 				IFile buildFileIFile = GradleUtil.getFileForLocation(absolutePath);
-				IContainer containerForLocation = root.getContainerForLocation(buildFileIFile.getFullPath());
+				IContainer containerForLocation = root.getContainerForLocation(buildFileIFile.getLocation());
 				while(! (containerForLocation instanceof IProject)){
 					containerForLocation = containerForLocation.getParent();
 				}
 				RefreshTaskJob job = new RefreshTaskJob((IProject)containerForLocation, absolutePath, gradlePluginLord, cache);
 				
-//				if(!synched){
+				if(!synched){
 					job.setUser(false);
+					job.setSystem(true);				
 					job.setPriority(Job.LONG);
+					
 					job.schedule(); // start as soon as possible
-//				}
-//				else{
-//					// something wrong while calculating tasks
-//					final IStatus clcTsksStatus = job.;
-//					if(!clcTsksStatus.isOK()){
-//						final Display display = Display.getCurrent();
-//						display.asyncExec(new Runnable() {
-//					    		public void run() {
-//					    			MessageDialog.openError(display.getActiveShell(), "Error while calculating gradle tasks", clcTsksStatus.getMessage());					    		}
-//					    });
-//					}
-//				}			
+				}
+					
+				else{
+					job.setUser(true);
+					job.runSynchronized();
+					// something wrong while calculating tasks
+					final IStatus status = job.getResult();
+					if(status!=null && !status.isOK()){
+						final Display display = Display.getCurrent();
+						display.asyncExec(new Runnable() {
+					    		public void run() {
+					    			MessageDialog.openError(display.getActiveShell(), "Error while calculating gradle tasks", status.getMessage());					    		}
+					    });
+					}
+				}			
 			}
 		}
 	}
@@ -146,8 +153,10 @@ public class GradleExecScheduler {
 				));
 		}
 
-		// create gradle build job
-		Job job = new ConfigurationBasedBuildJob(null, gradlePluginLord, buildFile.getAbsolutePath(), gradleProcess);
+		// create and schedule gradle build job
+		ConfigurationBasedBuildJob job = new ConfigurationBasedBuildJob(null, gradlePluginLord, buildFile.getAbsolutePath(), gradleProcess);
+//		job.
+		job.setUiProvidedCommandLineParams(commandLine.toString());
 		job.setUser(true);
 		job.setPriority(Job.LONG);
 		job.schedule(); // start as soon as possible

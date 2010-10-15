@@ -49,6 +49,16 @@ abstract class AbstractGradleJob extends Job{
 	private List<String> tasks = new ArrayList<String>();
 	private final boolean useRefreshQueue;
 	
+	protected String uiProvidedCommandLineParams = "";
+	
+	public String getUiProvidedCommandLineParams() {
+		return uiProvidedCommandLineParams;
+	}
+
+	public void setUiProvidedCommandLineParams(String uiProvidedCommandLineParams) {
+		this.uiProvidedCommandLineParams = uiProvidedCommandLineParams;
+	}
+
 	public AbstractGradleJob(IProject project, 
 							 GradlePluginLord pluginLord, 
 							 String name,
@@ -191,9 +201,13 @@ abstract class AbstractGradleJob extends Job{
 		configureInitScript(commandLineArgs);
 		configureTasks(commandLineArgs);
 		configureAdditionalCmdParams(commandLineArgs);
+		commandLineArgs.append(" ").append(uiProvidedCommandLineParams);
 		return commandLineArgs.toString();
 	}
 	
+	public IStatus runSynchronized(){
+		return run(null);
+	}
 	/**
 	 * This factory method creates a implementation specific ExecutionListener
 	 * */

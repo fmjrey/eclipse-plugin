@@ -42,7 +42,7 @@ public class RefreshTaskJob extends AbstractGradleJob{
 		this.cache = cache;
 	}
 	
-	protected IStatus afterGradleExecutionHook(){
+	protected IStatus afterGradleExecutionHook(IProgressMonitor monitor){
 		List<ProjectView> projects = pluginLord.getProjects();
 		cache.put(buildFilePath, projects);
 		return Status.OK_STATUS;
