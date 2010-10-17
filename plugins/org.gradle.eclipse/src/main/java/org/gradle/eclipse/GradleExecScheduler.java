@@ -81,14 +81,7 @@ public class GradleExecScheduler {
 				//run gradle only if directory exists
 				final GradlePluginLord gradlePluginLord = new GradlePluginLord();
 				
-				//resolve the IProject object of the buildfile 
-				IWorkspace workspace = ResourcesPlugin.getWorkspace();
-				IWorkspaceRoot root = workspace.getRoot();
-				IFile buildFileIFile = GradleUtil.getFileForLocation(absolutePath);
-				IContainer containerForLocation = root.getContainerForLocation(buildFileIFile.getLocation());
-				while(! (containerForLocation instanceof IProject)){
-					containerForLocation = containerForLocation.getParent();
-				}
+				IContainer containerForLocation = getProjectForPath(absolutePath);
 				RefreshTaskJob job = new RefreshTaskJob((IProject)containerForLocation, absolutePath, gradlePluginLord, cache);
 				
 				if(!synched){
@@ -114,6 +107,22 @@ public class GradleExecScheduler {
 				}			
 			}
 		}
+	}
+
+	/**
+	 * @param absolutePath
+	 * @return
+	 */
+	private IContainer getProjectForPath(final String absolutePath) {
+		//resolve the IProject object of the buildfile 
+		IWorkspace workspace = ResourcesPlugin.getWorkspace();
+		IWorkspaceRoot root = workspace.getRoot();
+		IFile buildFileIFile = GradleUtil.getFileForLocation(absolutePath);
+		IContainer containerForLocation = root.getContainerForLocation(buildFileIFile.getLocation());
+		while(! (containerForLocation instanceof IProject)){
+			containerForLocation = containerForLocation.getParent();
+		}
+		return containerForLocation;
 	}
 	
 	/**
@@ -141,7 +150,7 @@ public class GradleExecScheduler {
 	/**
 	 * @noreference This method is not intended to be referenced by clients.
 	 */
-	public void startGradleBuildRun(final ILaunchConfiguration configuration, final StringBuffer commandLine, final GradleProcess gradleProcess) throws CoreException{
+	public void startGradleBuildRun(final ILaunchConfiguration configuration, final List<String> tasks, final StringBuffer commandLine, final GradleProcess gradleProcess) throws CoreException{
 		final GradlePluginLord gradlePluginLord = new GradlePluginLord();
 		gradlePluginLord.setGradleHomeDirectory(new File(GradlePlugin.getPlugin().getGradleHome()));
 		String buildfilePath = configuration.getAttribute(IGradleConstants.ATTR_LOCATION, "");
@@ -152,10 +161,10 @@ public class GradleExecScheduler {
 											   "buildPath: [ " + buildfilePath + "] cannot be resolved")
 				));
 		}
-
 		// create and schedule gradle build job
-		ConfigurationBasedBuildJob job = new ConfigurationBasedBuildJob(null, gradlePluginLord, buildFile.getAbsolutePath(), gradleProcess);
-//		job.
+		IContainer projectForPath = getProjectForPath(buildFile.getAbsolutePath());
+		ConfigurationBasedBuildJob job = new ConfigurationBasedBuildJob((IProject)projectForPath, gradlePluginLord, buildFile.getAbsolutePath(), gradleProcess);
+		job.setTasks(tasks);
 		job.setUiProvidedCommandLineParams(commandLine.toString());
 		job.setUser(true);
 		job.setPriority(Job.LONG);

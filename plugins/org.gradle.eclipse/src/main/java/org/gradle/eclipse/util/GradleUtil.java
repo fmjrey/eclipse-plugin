@@ -86,8 +86,6 @@ public class GradleUtil {
 		}
 		IPath filePath = new Path(path);
 		IFile file = null;
-		;
-		System.out.println(filePath.toFile().getAbsolutePath());
 		IFile[] files = ResourcesPlugin.getWorkspace().getRoot()
 				.findFilesForLocationURI(filePath.toFile().toURI());
 		if (files.length > 0) {

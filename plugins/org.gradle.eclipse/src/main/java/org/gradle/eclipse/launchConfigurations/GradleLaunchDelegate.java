@@ -15,7 +15,9 @@
  */
 package org.gradle.eclipse.launchConfigurations;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.eclipse.core.runtime.CoreException;
@@ -40,6 +42,7 @@ import com.ibm.icu.text.MessageFormat;
  */
 public class GradleLaunchDelegate extends LaunchConfigurationDelegate  {
 
+	@SuppressWarnings("unchecked")
 	public void launch(ILaunchConfiguration configuration, String mode, ILaunch launch, IProgressMonitor monitor) throws CoreException {
 		if (monitor.isCanceled()) {
 			return;
@@ -61,14 +64,13 @@ public class GradleLaunchDelegate extends LaunchConfigurationDelegate  {
 
 		
 		StringBuffer cmdLine = new StringBuffer(configuration.getAttribute(IGradleConstants.ATTR_TOOL_ARGUMENTS, ""));
-		cmdLine.append(" ").append(configuration.getAttribute(IGradleConstants.GRADLE_TASKS_ATTRIBUTES, ""));
-		
+		List<String> tasks = configuration.getAttribute(IGradleConstants.GRADLE_TASKS_ATTRIBUTES, new ArrayList<String>());
 		//add debug flag if mode is DEBUG
 		if(mode.equals("debug")){
 			cmdLine.append(" ").append("-d");
 		}
 		monitor.worked(1);
-		runGradleBuild(configuration, launch, monitor, "idStamp" + System.currentTimeMillis(), cmdLine);
+		runGradleBuild(configuration, launch, monitor, "idStamp" + System.currentTimeMillis(), tasks, cmdLine);
 		monitor.worked(1);
 		if (monitor.isCanceled()) {
 			return;
@@ -76,12 +78,12 @@ public class GradleLaunchDelegate extends LaunchConfigurationDelegate  {
 		monitor.done();
 	}
 	
-	private void runGradleBuild(ILaunchConfiguration configuration, ILaunch launch, IProgressMonitor monitor, String idStamp, StringBuffer cmdLine) throws CoreException {
+	private void runGradleBuild(ILaunchConfiguration configuration, ILaunch launch, IProgressMonitor monitor, String idStamp, List<String> tasks, StringBuffer cmdLine) throws CoreException {
 		Map<String, String> attributes= new HashMap<String, String>(2);
 		attributes.put(IProcess.ATTR_PROCESS_TYPE, IGradleConstants.ID_GRADLE_PROCESS_TYPE);
 		final GradleProcess process = new GradleProcess("GradleProcess", launch, attributes);
 		
-		GradleRunner runner = new GradleRunner(configuration, launch, cmdLine);
+		GradleRunner runner = new GradleRunner(configuration, launch, tasks, cmdLine);
 		try {
 			runner.run(monitor);
 		} catch (CoreException e) {

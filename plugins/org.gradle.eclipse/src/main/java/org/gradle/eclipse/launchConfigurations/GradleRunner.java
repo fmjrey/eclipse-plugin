@@ -15,6 +15,8 @@
  */
 package org.gradle.eclipse.launchConfigurations;
 
+import java.util.List;
+
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.debug.core.ILaunch;
@@ -32,18 +34,19 @@ public class GradleRunner {
 	private ILaunchConfiguration configuration;
 	private StringBuffer commandLine;
 	private ILaunch launch;
+	private List<String> tasks;
 
-	public GradleRunner(ILaunchConfiguration configuration, ILaunch launch, StringBuffer commandLine) throws CoreException {
+	public GradleRunner(ILaunchConfiguration configuration, ILaunch launch, List<String>tasks, StringBuffer commandLine) throws CoreException {
 		this.launch = launch;
 		this.configuration = configuration;
+		this.tasks = tasks;
 		this.commandLine = commandLine;
 	}
 	
 	public void run(IProgressMonitor monitor) throws CoreException{
 		monitor.beginTask("Invoking Gradle", 100);
-//		Long start = System.currentTimeMillis();
 		monitor.worked(5);
-		GradleExecScheduler.getInstance().startGradleBuildRun(configuration, commandLine, getProcess());
+		GradleExecScheduler.getInstance().startGradleBuildRun(configuration, tasks, commandLine, getProcess());
 		monitor.done();
 	}
 

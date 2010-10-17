@@ -313,12 +313,12 @@ public class GradleTasksTab extends AbstractLaunchConfigurationTab implements IP
 	
 	public void performApply(ILaunchConfigurationWorkingCopy configuration) {
 		//build tasks string
-		StringBuilder sb = new StringBuilder();
+		List<String> taskList = new ArrayList<String>();
 		for(TaskView task : selectedTasks){
-			sb.append(task.toString()).append(" ");
+			taskList.add(task.toString());
 		}
 		
-		configuration.setAttribute(IGradleConstants.GRADLE_TASKS_ATTRIBUTES, sb.toString().trim());
+		configuration.setAttribute(IGradleConstants.GRADLE_TASKS_ATTRIBUTES, taskList);
 
 	}
 
