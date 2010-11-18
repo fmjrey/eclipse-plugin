@@ -23,7 +23,7 @@
  *	reused by other osgi plugins
  *
  * 2. org.gradle.eclipse
- *	This plugin contains all logic, extension points and implementations to extend the eclipse ide. 
+ *	This plugin contains all logic, extension points and implementations to extend the eclipse ide.
  *	By default it imports the gradle-api exported via org.codehaus.gradle
  *
  * To build this gradle eclipse plugin the following steps should be implemented in this build file:
@@ -39,20 +39,24 @@
 
 apply plugin:'FeaturePde'
 
-buildscript { 
-    repositories { 
+task wrapper(type: Wrapper) {
+	gradleVersion = '0.9-rc-3'
+}
+
+buildscript {
+    repositories {
 		add(new org.apache.ivy.plugins.resolver.URLResolver()) {
 			name = 'pdePluginRepo'
-			addArtifactPattern('https://github.com/breskeby/gradleplugins/raw/gradle-eplugin-build/pdePlugin/dists/[artifact]-[revision](-[classifier])(.[ext])')	
-			}
-	} 
+			addArtifactPattern('https://github.com/breskeby/gradleplugins/raw/gradle-eplugin-build/pdePlugin/dists/[artifact]-[revision](-[classifier])(.[ext])')
+		}
+	}
 	dependencies {
-		classpath ':pdePlugin:5.0' 
-	} 
+		classpath ':pdePlugin:5.0'
+	}
 }
 
 subprojects {
-   
+
 	repositories {
 		add(new org.apache.ivy.plugins.resolver.FileSystemResolver()) {
 	        name = 'repo'
@@ -62,7 +66,7 @@ subprojects {
 	        checkmodified = true
 		}
 	}
-	
+
  	group = 'org.gradle'
 	apply plugin:'java'
     plugins.withType(JavaPlugin).whenPluginAdded {
@@ -79,12 +83,12 @@ if(!hasProperty('eclipseLocation')){
 
 
 
-configure(FeaturePde){	
+configure(FeaturePde){
 	def projectDir = getRootDir()
 	featureName = "org.gradle.eclipse.feature"
 	envConfigs = "*, *, *"
 	buildDirectory = file("build/tmp/")
-	publishDirectory = "${projectDir}/build/tmp/publish"	
+	publishDirectory = "${projectDir}/build/tmp/publish"
 	pluginsSrcDirList = ["${projectDir}/build/tmp/plugins"]
 	featuresSrcDir = "${projectDir}/build/tmp/features"
 	builderDir = "${projectDir}/build/tmp"
@@ -94,25 +98,24 @@ configure(FeaturePde){
 	eclipseLauncher = "${baseLocation}"
 	equinoxLauncher="${baseLocation}/plugins/org.eclipse.equinox.launcher"
 	equinoxLauncherPluginVersion = "1.1.0.v20100507"
-	pdeBuildPluginVersion = "3.6.0.v20100603"
+	pdeBuildPluginVersion = "3.6.1.R36x_v20100823"
 }
 
 //util methods
-String createBundleClasspath(FileTree zipContent){
-	def BUNDLE_LIB_SEPERATOR = ",\n "
-	
+String createBundleClasspath(FileTree zipContent, suffix="", String prefix="", removeLastSuffix=true){
+
 	StringBuffer buffer = new StringBuffer();
 	zipContent.visit {node ->
 		if(node.toString().endsWith("jar")){
 			def filepath = node.relativePath.pathString
 			def bundleClasspathEntry = filepath.substring(filepath.indexOf('/') + 1)
-			buffer.append(bundleClasspathEntry).append(BUNDLE_LIB_SEPERATOR)
+			buffer.append(prefix).append(bundleClasspathEntry).append(suffix)
 		}
 	}
 	def bundleClasspath = buffer.toString()
-	
-	//remove the last colone and linebreak
-	bundleClasspath.substring(0, bundleClasspath.length() - BUNDLE_LIB_SEPERATOR.length())	
+
+	//remove the last suffix
+	removeLastSuffix ? bundleClasspath.substring(0, bundleClasspath.length() - suffix.length()) : bundleClasspath
 }
 //
 
@@ -133,7 +136,7 @@ configurations {
 }
 
 dependencies{
-	workspaceSetup "gradle:gradle:0.9-rc-1:bin@zip"
+	workspaceSetup "gradle:gradle:0.9-rc-3:bin@zip"
 }
 
 //tasks
@@ -172,14 +175,23 @@ task mergeGradleDist(dependsOn:'copyFragments') << {
 			}
 		 	into 'build/tmp/plugins/org.codehaus.gradle/'
 		}
-	}	
-	
-	String bundleClasspath = createBundleClasspath(zipContent);
+	}
+
+	String bundleClasspath = createBundleClasspath(zipContent, ",\n ")
 	File manifestFile = file('build/tmp/plugins/org.codehaus.gradle/META-INF/MANIFEST.MF')
-		
+
 	def manifestContent = manifestFile.text
 	manifestContent = manifestContent.replaceAll(BUNDLE_CLASSPATH_PLACEHOLDER, bundleClasspath)
 	manifestFile.write(manifestContent)
+
+//	<classpathentry exported="true" kind="lib" path="lib/plugins/ant-antlr-1.8.1.jar"/>
+  	bundleClasspath = createBundleClasspath(zipContent, '"/>\n','\t<classpathentry exported="true" kind="lib" path="', false)
+	File classpathFile = file('build/tmp/plugins/org.codehaus.gradle/.classpath')
+
+	def classpathContent = classpathFile.text
+	classpathContent = classpathContent.replaceAll(BUNDLE_CLASSPATH_PLACEHOLDER, bundleClasspath)
+	classpathFile.write(classpathContent)
+
 }
 
 pdeUpload.dependsOn mergeGradleDist
