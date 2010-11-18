@@ -184,7 +184,6 @@ task mergeGradleDist(dependsOn:'copyFragments') << {
 	manifestContent = manifestContent.replaceAll(BUNDLE_CLASSPATH_PLACEHOLDER, bundleClasspath)
 	manifestFile.write(manifestContent)
 
-//	<classpathentry exported="true" kind="lib" path="lib/plugins/ant-antlr-1.8.1.jar"/>
   	bundleClasspath = createBundleClasspath(zipContent, '"/>\n','\t<classpathentry exported="true" kind="lib" path="', false)
 	File classpathFile = file('build/tmp/plugins/org.codehaus.gradle/.classpath')
 
