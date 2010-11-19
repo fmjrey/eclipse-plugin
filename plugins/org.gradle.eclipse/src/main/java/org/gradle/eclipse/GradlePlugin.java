@@ -46,25 +46,25 @@ import org.osgi.util.tracker.ServiceTracker;
 
 /**
  * @author Rene Groeschke
- * 
+ *
  * The activator class controls the plug-in life cycle
  */
 public class GradlePlugin extends AbstractUIPlugin {
 
 	private static final String EMPTY_STRING= ""; //$NON-NLS-1$
-	
+
 	/**
 	 * Status code indicating an unexpected internal error.
 	 * @since 2.1
 	 */
-	public static final int INTERNAL_ERROR = 120;		
+	public static final int INTERNAL_ERROR = 120;
 
 	// The plug-in ID
 	public static final String PLUGIN_ID = IGradleConstants.PLUGIN_ID;
-	
+
 	// The shared instance
 	private static GradlePlugin plugin;
-	
+
 	private String cachedDefaultGradleHome = null;
 
 	/**
@@ -80,7 +80,7 @@ public class GradlePlugin extends AbstractUIPlugin {
 		return display;
 	}
 
-	
+
 	/**
 	 * The constructor
 	 */
@@ -95,7 +95,7 @@ public class GradlePlugin extends AbstractUIPlugin {
 	public static GradlePlugin getPlugin() {
 		return plugin;
 	}
-	
+
 	/*
 	 * (non-Javadoc)
 	 * @see org.eclipse.ui.plugin.AbstractUIPlugin#start(org.osgi.framework.BundleContext)
@@ -134,7 +134,7 @@ public class GradlePlugin extends AbstractUIPlugin {
 	public static ImageDescriptor getImageDescriptor(String path) {
 		return imageDescriptorFromPlugin(PLUGIN_ID, path);
 	}
-	
+
 	/**
 	 * Returns whether the current OS claims to be Mac
 	 */
@@ -142,46 +142,46 @@ public class GradlePlugin extends AbstractUIPlugin {
 		String osname = System.getProperty("os.name").toLowerCase(Locale.US); //$NON-NLS-1$
 		return osname.indexOf("mac") != -1; //$NON-NLS-1$
 	}
-	
+
 	/**
 	 * Logs the specified throwable with this plug-in's log.
-	 * 
-	 * @param t throwable to log 
+	 *
+	 * @param t throwable to log
 	 */
 	public static void log(Throwable t) {
 		IStatus status= new Status(IStatus.ERROR, PLUGIN_ID, INTERNAL_ERROR, "Error logged from GradlePlugin: ", t); //$NON-NLS-1$
 		log(status);
 	}
-	
+
 	/**
 	 * Logs the specified status with this plug-in's log.
-	 * 
-	 * @param status status 
+	 *
+	 * @param status status
 	 */
 	public static void log(IStatus status) {
 		getDefault().getLog().log(status);
 	}
-	
+
 	/**
 	 * Writes the message to the plug-in's log
-	 * 
+	 *
 	 * @param message the text to write to the log
 	 */
 	public static void log(String message, Throwable exception) {
 		IStatus status = newErrorStatus(message, exception);
 		log(status);
 	}
-	
+
 	/**
 	 * Returns a new <code>IStatus</code> for this plug-in
 	 */
 	public static IStatus newErrorStatus(String message, Throwable exception) {
 		if (message == null) {
-			message= EMPTY_STRING; 
-		}		
+			message= EMPTY_STRING;
+		}
 		return new Status(IStatus.ERROR, PLUGIN_ID, 0, message, exception);
 	}
-	
+
 	/**
 	* Returns the active workbench page or <code>null</code> if none.
 	*/
@@ -199,11 +199,11 @@ public class GradlePlugin extends AbstractUIPlugin {
    public static IWorkbenchWindow getActiveWorkbenchWindow() {
 	   return getDefault().getWorkbench().getActiveWorkbenchWindow();
    }
-	
+
 	/**
-	 * Simple algorithm to find the highest version of <code>org.codehaus.gradle</code> 
+	 * Simple algorithm to find the highest version of <code>org.codehaus.gradle</code>
 	 * available. If there are other providers that are not <code>org.codehaus.gradle</code>
-	 * <code>null</code> is returned so that all bundles will be inspected 
+	 * <code>null</code> is returned so that all bundles will be inspected
 	 * for contributed libraries.
 	 * <p>
 	 * https://bugs.eclipse.org/bugs/show_bug.cgi?id=282851
@@ -242,10 +242,10 @@ public class GradlePlugin extends AbstractUIPlugin {
 		}
 		return highest;
 	}
-	
-	
-	private String getDefaultGradleHome() {
-		//use default gradlehome 
+
+
+	String getDefaultGradleHome() {
+		//use default gradlehome
 		if(cachedDefaultGradleHome != null){
 			return cachedDefaultGradleHome;
 		}
@@ -253,7 +253,7 @@ public class GradlePlugin extends AbstractUIPlugin {
 		tracker.open();
 		try {
 			PackageAdmin packageAdmin = (PackageAdmin) tracker.getService();
-					
+
 			if (packageAdmin != null) {
 				ExportedPackage[] packages = packageAdmin.getExportedPackages("org.gradle"); //$NON-NLS-1$
 				Bundle bundle = findHighestGradleVersion(packages);
@@ -268,7 +268,7 @@ public class GradlePlugin extends AbstractUIPlugin {
 		}finally {
 			tracker.close();
 		}
-		
+
 		//check if gradle scripts are executable
 		makeGradleScriptsExecutable(cachedDefaultGradleHome);
 		return cachedDefaultGradleHome;
@@ -277,14 +277,16 @@ public class GradlePlugin extends AbstractUIPlugin {
 	/**
 	 * this is necessary because root.permissions in feature build.properties doesn't work yet
 	 * */
-	private void makeGradleScriptsExecutable(String gradleHomeString) {
+	void makeGradleScriptsExecutable(String gradleHomeString) {
 		String gradleBinPath = gradleHomeString + System.getProperty("file.separator") + "bin"+System.getProperty("file.separator");
 		File scriptMacLinux = new File(gradleBinPath+"gradle");
 		File scriptWin = new File(gradleBinPath+"gradle.bat");
-		
+
 		//setScripts executable
-		scriptMacLinux.setExecutable(true);
-		scriptWin.setExecutable(true);
+		if (!scriptMacLinux.canExecute() && scriptMacLinux.canWrite())
+			scriptMacLinux.setExecutable(true);
+		if (!scriptWin.canExecute() && scriptWin.canWrite())
+			scriptWin.setExecutable(true);
 
 	}
 
@@ -309,7 +311,7 @@ public class GradlePlugin extends AbstractUIPlugin {
 	public String getGradleHome(){
 		return getGradleHome(getDefault().getPreferenceStore());
 	}
-	
+
 	/**
 	 * @return the absolute path to the gradleHome stored in {@link IPreferenceStore}
 	 * */
@@ -319,6 +321,7 @@ public class GradlePlugin extends AbstractUIPlugin {
 		if(useCustomGradleHome){
 			String gradleHome = store.getString(IGradlePreferenceConstants.MANUELL_GRADLE_HOME);
 			if(gradleHome!=null && !gradleHome.trim().equals("")){
+				makeGradleScriptsExecutable(gradleHome);
 				return gradleHome;
 			}else{
 				GradlePlugin.getStandardDisplay().asyncExec
@@ -329,7 +332,7 @@ public class GradlePlugin extends AbstractUIPlugin {
 			        }
 			    });
 			}
-		}		
+		}
 		return getDefaultGradleHome();
 	}
 }

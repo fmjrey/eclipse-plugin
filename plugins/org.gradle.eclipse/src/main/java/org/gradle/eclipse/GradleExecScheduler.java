@@ -33,6 +33,7 @@ import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.swt.widgets.Display;
+import org.gradle.eclipse.GradlePlugin;
 import org.gradle.eclipse.job.ConfigurationBasedBuildJob;
 import org.gradle.eclipse.job.RefreshTaskJob;
 import org.gradle.eclipse.job.UpdateClasspathJob;
@@ -53,17 +54,19 @@ public class GradleExecScheduler {
 	 * The Gradle Scheduler manages the lifecycle of the buildinformation cache
 	 * */
 	private BuildInformationCache cache;
-	
-	
+
+
 	public static GradleExecScheduler getInstance() {
 		if(instance==null){
 			instance = new GradleExecScheduler();
 		}
 		return instance;
 	}
-	
+
 	private GradleExecScheduler(){
 		this.cache = new BuildInformationCache();
+		GradlePlugin.getPlugin().getGradleHome(); // side-effect: make gradle file in bin dir executable
+		GradlePlugin.getPlugin().getDefaultGradleHome(); // side-effect: make gradle file in bin dir executable
 	}
 
 	public List<ProjectView> getProjectViews(String absolutePath) {
@@ -76,22 +79,22 @@ public class GradleExecScheduler {
 	public void refreshTaskView(final String absolutePath, boolean synched) {
 		if(absolutePath!=null && !absolutePath.isEmpty()){
 			final File absoluteDirectory = new File(absolutePath).getParentFile();
-			
+
 			if(absoluteDirectory.exists()){
 				//run gradle only if directory exists
 				final GradlePluginLord gradlePluginLord = new GradlePluginLord();
-				
+
 				IContainer containerForLocation = getProjectForPath(absolutePath);
 				RefreshTaskJob job = new RefreshTaskJob((IProject)containerForLocation, absolutePath, gradlePluginLord, cache);
-				
+
 				if(!synched){
 					job.setUser(false);
-					job.setSystem(true);				
+					job.setSystem(true);
 					job.setPriority(Job.LONG);
-					
+
 					job.schedule(); // start as soon as possible
 				}
-					
+
 				else{
 					job.setUser(true);
 					job.runSynchronized();
@@ -104,7 +107,7 @@ public class GradleExecScheduler {
 					    			MessageDialog.openError(display.getActiveShell(), "Error while calculating gradle tasks", status.getMessage());					    		}
 					    });
 					}
-				}			
+				}
 			}
 		}
 	}
@@ -114,7 +117,7 @@ public class GradleExecScheduler {
 	 * @return
 	 */
 	private IContainer getProjectForPath(final String absolutePath) {
-		//resolve the IProject object of the buildfile 
+		//resolve the IProject object of the buildfile
 		IWorkspace workspace = ResourcesPlugin.getWorkspace();
 		IWorkspaceRoot root = workspace.getRoot();
 		IFile buildFileIFile = GradleUtil.getFileForLocation(absolutePath);
@@ -124,9 +127,9 @@ public class GradleExecScheduler {
 		}
 		return containerForLocation;
 	}
-	
+
 	/**
-	 * 
+	 *
 	 * @param projectToUpdate the project which classpath will be updated
 	 * */
 	public void updateProjectClasspath(IPreferenceStore store, String absoluteBuildPath, IProject projectToUpdate) throws CoreException{
@@ -135,18 +138,18 @@ public class GradleExecScheduler {
 
 		File buildFile = new File(VariablesPlugin.getDefault().getStringVariableManager().performStringSubstitution(absoluteBuildPath));
 		if(buildFile==null || !buildFile.exists()){
-			throw(new CoreException(new Status(IStatus.ERROR, IGradleConstants.PLUGIN_ID, 
+			throw(new CoreException(new Status(IStatus.ERROR, IGradleConstants.PLUGIN_ID,
 											   "buildPath: [ " + absoluteBuildPath + "] cannot be resolved")
 				 ));
 		}
-			
+
 		// create gradle build job
 		Job job = new UpdateClasspathJob(projectToUpdate, gradlePluginLord, absoluteBuildPath);
 		job.setUser(true);
 		job.setPriority(Job.LONG);
 		job.schedule(); // start as soon as possible
 	}
-	
+
 	/**
 	 * @noreference This method is not intended to be referenced by clients.
 	 */
@@ -156,8 +159,8 @@ public class GradleExecScheduler {
 		String buildfilePath = configuration.getAttribute(IGradleConstants.ATTR_LOCATION, "");
 		File buildFile = new File(VariablesPlugin.getDefault().getStringVariableManager().performStringSubstitution(buildfilePath));
 		if(buildFile==null || !buildFile.exists()){
-			throw(new CoreException(new Status(IStatus.ERROR, 
-											   IGradleConstants.PLUGIN_ID, 
+			throw(new CoreException(new Status(IStatus.ERROR,
+											   IGradleConstants.PLUGIN_ID,
 											   "buildPath: [ " + buildfilePath + "] cannot be resolved")
 				));
 		}
