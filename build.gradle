@@ -40,7 +40,7 @@
 apply plugin:'FeaturePde'
 
 task wrapper(type: Wrapper) {
-	gradleVersion = '0.9-rc-3'
+	gradleVersion = '0.9'
 }
 
 buildscript {
@@ -58,7 +58,7 @@ buildscript {
 subprojects {
 
 	repositories {
-		add(new org.apache.ivy.plugins.resolver.FileSystemResolver()) {
+		addFirst(new org.apache.ivy.plugins.resolver.FileSystemResolver()) {
 	        name = 'repo'
 	        addIvyPattern "$eclipseLocation/plugins/[organisation].[module]-ivy-[revision].xml"
 	        addArtifactPattern "$eclipseLocation/plugins/[organisation].[module]_[revision](-[classifier]).[ext]"
@@ -78,7 +78,7 @@ subprojects {
 }
 
 if(!hasProperty('eclipseLocation')){
-	throw (new InvalidUserDataException("The property 'eclipseLocation' not set. Use -PeclipseLocation=/Path/to/eclipse"))
+	throw (new InvalidUserDataException("The property 'eclipseLocation' not set. Use -PeclipseLocation=/Path/to/eclipse or set it in the gradle.properties file"))
 }
 
 
@@ -123,7 +123,7 @@ repositories {
 	// get the latest available gradle snapshot. Are files resolved via URLResolver are cacheable?
 	add(new org.apache.ivy.plugins.resolver.URLResolver()) {
 		name = 'gradle-dists'
-		addArtifactPattern 'http://dist.codehaus.org/([organization]/)[artifact](-[revision])(-[classifier]).[ext]'
+		addArtifactPattern 'http://gradle.artifactoryonline.com/gradle/distributions/[artifact](-[revision])(-[classifier]).[ext]'
 	}
 	add(new org.apache.ivy.plugins.resolver.URLResolver()) {
 		name = 'gradle-snapshots'
@@ -136,7 +136,7 @@ configurations {
 }
 
 dependencies{
-	workspaceSetup "gradle:gradle:0.9-rc-3:bin@zip"
+	workspaceSetup "gradle:gradle:0.9:bin@zip"
 }
 
 //tasks
