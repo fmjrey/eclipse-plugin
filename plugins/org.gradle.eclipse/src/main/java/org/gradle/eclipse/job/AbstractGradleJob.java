@@ -165,7 +165,9 @@ abstract class AbstractGradleJob extends Job{
 	        	processResult.setOutput(output);
 	        }
 	    };
-	    
+	    // add the observer before we add the request due to timing issues.
+	    // It's possible for it to completely execute before we return from
+	    // addExecutionRequestToQueue.
 	    pluginLord.addRequestObserver(observer, false);
 	    String gradleCommandLine = setupGradleCommandLine();
 	    
@@ -183,7 +185,8 @@ abstract class AbstractGradleJob extends Job{
 				return new Status(IStatus.WARNING, GradlePlugin.PLUGIN_ID, "Error while recalculating Gradle Tasks", e);
 			}
 		}
-				
+		// -1 indicates failing process creation
+	 	//  1 indicates process started correctly but build failed
 		if( processResult.getResult() == -1) {
 			return new Status(IStatus.ERROR, GradlePlugin.PLUGIN_ID,
 					"Error while starting Gradle Process. Please check that GRADLE_HOME is defined correctly in your preferences!", executionListener

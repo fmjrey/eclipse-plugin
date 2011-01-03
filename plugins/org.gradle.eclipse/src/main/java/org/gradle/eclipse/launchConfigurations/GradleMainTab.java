@@ -135,7 +135,6 @@ public class GradleMainTab extends ExternalToolsMainTab {
 	
 	//empty method needed to hide working directory
 	protected void updateWorkingDirectory(ILaunchConfiguration configuration) {
-//		super.updateWorkingDirectory(configuration);
 	}
 	
 	protected boolean validateWorkDirectory(){

@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.gradle.eclipse.job;
 
 import org.eclipse.core.resources.IProject;
@@ -34,73 +33,6 @@ public class ConfigurationBasedBuildJob extends AbstractGradleJob {
 		super(project, gradlePluginLord, "Running Gradle Build...", absoluteBuildFilePath);
 		this.process = process;
 	}
-
-//	@Override
-//	protected IStatus runGradleJob(IProgressMonitor monitor) {
-//
-//		final GradleProcessExecListener executionlistener = 
-//		
-//		pluginLord.startExecutionQueue();
-//
-//		final GradleProcessResult processResult = new GradleProcessResult();
-//		// /
-//		GradlePluginLord.RequestObserver observer = new GradlePluginLord.RequestObserver() {
-//			public void executionRequestAdded(ExecutionRequest request) {
-//				request.setExecutionInteraction(executionlistener);
-//			}
-//
-//			public void refreshRequestAdded(RefreshTaskListRequest request) {
-//
-//			}
-//
-//			public void aboutToExecuteRequest(Request request) {
-//
-//			}
-//
-//			/**
-//			 * -1 indicates failing process creation
-//			 * 1 indicates process started correctly but build failed
-//			 * */
-//			public void requestExecutionComplete(Request request, int result,
-//					String output) {
-//				processResult.setComplete(true);
-//				processResult.setResult(result);
-//				processResult.setOutput(output);
-//			}
-//		};
-//
-//		// add the observer before we add the request due to timing issues.
-//		// It's possible for it to completely execute before we return from
-//		// addExecutionRequestToQueue.
-//
-//		pluginLord.addRequestObserver(observer, false);
-//		pluginLord.addExecutionRequestToQueue(commandLine, configuration.getName());
-//
-//		// gradlePluginLord.addExecutionRequestToQueue(commandLine,
-//		// executionlistener);
-//		// keep job open til listener reports gradle has finished
-//		while (!processResult.isComplete()) {
-//			try {
-//				Thread.sleep(100);
-//			} catch (InterruptedException e) {
-//				return new Status(IStatus.WARNING, GradlePlugin.PLUGIN_ID,
-//						"Error while running Gradle Tasks", e);
-//			}
-//		}
-//
-//		if (executionlistener.getThrowable() != null) {
-//			return new Status(IStatus.WARNING, GradlePlugin.PLUGIN_ID,
-//					"Error while running Gradle Tasks", executionlistener
-//							.getThrowable());
-//		}
-//		
-//		if(!executionlistener.isSuccessful() && processResult.getResult()==-1) {
-//			return new Status(IStatus.ERROR, GradlePlugin.PLUGIN_ID,
-//					"Error while starting Gradle Process. Please check that GRADLE_HOME is defined correctly in your preferences!", executionlistener
-//							.getThrowable());
-//		}
-//		return Status.OK_STATUS;
-//	}
 
 	@Override
 	protected GradleProcessExecListener createExecutionListener(

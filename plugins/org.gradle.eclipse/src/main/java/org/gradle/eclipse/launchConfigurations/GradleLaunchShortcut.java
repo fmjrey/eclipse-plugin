@@ -195,8 +195,6 @@ public class GradleLaunchShortcut implements ILaunchShortcut2 {
 		
 		ILaunchManager launchManager = DebugPlugin.getDefault().getLaunchManager();
 		String name = launchManager.generateUniqueLaunchConfigurationNameFrom(buffer.toString());
-//		DebugPlugin.getDefault()
-//		String name = Long.toString(System.currentTimeMillis());
 		return name;
 	}
 	
