@@ -40,7 +40,7 @@
 apply plugin:'FeaturePde'
 
 task wrapper(type: Wrapper) {
-	gradleVersion = '0.9'
+	gradleVersion = '0.9.1'
 }
 
 buildscript {
@@ -136,7 +136,7 @@ configurations {
 }
 
 dependencies{
-	workspaceSetup "gradle:gradle:0.9:bin@zip"
+	workspaceSetup "gradle:gradle:0.9.1:bin@zip"
 }
 
 //tasks

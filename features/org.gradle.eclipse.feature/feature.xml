@@ -2,7 +2,7 @@
 <feature
       id="org.gradle.eclipse.feature"
       label="Gradle Feature"
-      version="0.9.0.qualifier"
+      version="0.9.1.qualifier"
       provider-name="gradle.org">
 
    <description url="http://www.gradle.org/">
