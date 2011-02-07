@@ -177,6 +177,7 @@ task mergeGradleDist(dependsOn:'copyFragments') << {
 		}
 	}
 
+	file('build/tmp/plugins/org.codehaus.gradle/bin/gradle').setExecutable(true, false)
 	String bundleClasspath = createBundleClasspath(zipContent, ",\n ")
 	File manifestFile = file('build/tmp/plugins/org.codehaus.gradle/META-INF/MANIFEST.MF')
 
