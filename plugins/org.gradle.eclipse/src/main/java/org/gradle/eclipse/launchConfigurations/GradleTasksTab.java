@@ -34,10 +34,12 @@ import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.CheckStateChangedEvent;
-import org.eclipse.jface.viewers.CheckboxTableViewer;
+import org.eclipse.jface.viewers.CheckboxTreeViewer;
+import org.eclipse.jface.viewers.ColumnLabelProvider;
 import org.eclipse.jface.viewers.ColumnWeightData;
 import org.eclipse.jface.viewers.ICheckStateListener;
 import org.eclipse.jface.viewers.TableLayout;
+import org.eclipse.jface.viewers.TreeViewerColumn;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ShellAdapter;
 import org.eclipse.swt.events.ShellEvent;
@@ -47,13 +49,13 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Table;
-import org.eclipse.swt.widgets.TableColumn;
+import org.eclipse.swt.widgets.Tree;
 import org.eclipse.ui.PlatformUI;
 import org.gradle.eclipse.GradleExecScheduler;
 import org.gradle.eclipse.GradleImages;
 import org.gradle.eclipse.GradlePlugin;
 import org.gradle.eclipse.IGradleConstants;
+import org.gradle.eclipse.model.GradleTaskModel;
 import org.gradle.eclipse.model.GradleTaskModelContentProvider;
 import org.gradle.eclipse.model.GradleTaskModelLabelProvider;
 import org.gradle.eclipse.util.GradleUtil;
@@ -67,14 +69,15 @@ import org.gradle.foundation.TaskView;
  */
 public class GradleTasksTab extends AbstractLaunchConfigurationTab implements IPropertyChangeListener {
 
-	private CheckboxTableViewer fTableViewer = null;
-	private List<TaskView> fAllTasks;
+	private CheckboxTreeViewer fTreeViewer = null;
 	private ILaunchConfiguration launchConfiguration;
 	private List<ProjectView> allProjects = null;
-	private List<TaskView> defaultTasks = new ArrayList<TaskView>();
-	private ProjectView project;
+	private ProjectView rootProject = null;
+	private final GradleTaskModel model = new GradleTaskModel();
+	private final GradleTaskModelLabelProvider labelProvider = new GradleTaskModelLabelProvider();
+	private final GradleTaskModelContentProvider contentProvider = new GradleTaskModelContentProvider(model);
 	
-	private List<TaskView> selectedTasks = new ArrayList<TaskView>();
+	private List<Object> selectedTasks = new ArrayList<Object>();
 	
 	/* (non-Javadoc)
 	 * @see org.eclipse.debug.ui.ILaunchConfigurationTab#createControl(org.eclipse.swt.widgets.Composite)
@@ -91,7 +94,7 @@ public class GradleTasksTab extends AbstractLaunchConfigurationTab implements IP
 		comp.setLayoutData(gd);
 		comp.setFont(font);
 		
-		createTasksTable(comp);
+		createTasksTableTree(comp);
 		
 		Composite buttonComposite= new Composite(comp, SWT.NONE);
 		GridLayout layout= new GridLayout();
@@ -120,42 +123,55 @@ public class GradleTasksTab extends AbstractLaunchConfigurationTab implements IP
 	}
 	
 	/**
-	 * Creates the table which displays the available tasks
+	 * Creates the table tree which displays the available tasks
 	 * @param parent the parent composite
 	 */
-	private void createTasksTable(Composite parent) {
+	private void createTasksTableTree(Composite parent) {
 		Font font= parent.getFont();
 		Label label = new Label(parent, SWT.NONE);
 		label.setFont(font);
 		label.setText(GradleLaunchConfigurationMessages.GradleTasksTab_Check_task_to_e_xecute__1);
 				
-		final Table table= new Table(parent, SWT.CHECK | SWT.BORDER | SWT.FULL_SELECTION );
+		fTreeViewer = new CheckboxTreeViewer(parent, SWT.CHECK | SWT.BORDER | SWT.FULL_SELECTION );
+		fTreeViewer.setLabelProvider(labelProvider);
+		fTreeViewer.setContentProvider(contentProvider);
+
+		final Tree tree= fTreeViewer.getTree();
 		
 		GridData data= new GridData(GridData.FILL_BOTH);
 		int availableRows= availableRows(parent);
-		data.heightHint = table.getItemHeight() * (availableRows / 20);
+		data.heightHint = tree.getItemHeight() * (availableRows / 20);
 		data.widthHint = 500;
 		data.minimumWidth = 500;
-		
-		table.setLayoutData(data);
-		table.setFont(font);	
-		table.setHeaderVisible(true);
-		table.setLinesVisible(true);		
+		tree.setLayoutData(data);
+		tree.setFont(font);	
+		tree.setHeaderVisible(true);
+		tree.setLinesVisible(true);		
 
-		TableLayout tableLayout= new TableLayout();
+		TableLayout treeLayout= new TableLayout();
 		ColumnWeightData weightData = new ColumnWeightData(250, true);
-		tableLayout.addColumnData(weightData);
+		treeLayout.addColumnData(weightData);
 		weightData = new ColumnWeightData(250, true);
-		tableLayout.addColumnData(weightData);		
-		table.setLayout(tableLayout);
+		treeLayout.addColumnData(weightData);		
+		tree.setLayout(treeLayout);
 
-		final TableColumn column1= new TableColumn(table, SWT.NULL);
-		column1.setText(GradleLaunchConfigurationMessages.GradleTasksTab_Name_5);
-		column1.setWidth(300);
+		final TreeViewerColumn column1= new TreeViewerColumn(fTreeViewer, SWT.NULL);
+		column1.setLabelProvider(new ColumnLabelProvider() {
+			public String getText(Object node) {
+				return labelProvider.getColumnText(node, 0);
+			}
+		});
+		column1.getColumn().setText(GradleLaunchConfigurationMessages.GradleTasksTab_Name_5);
+		column1.getColumn().setWidth(300);
 		
-		final TableColumn column2= new TableColumn(table, SWT.NULL);
-		column2.setText(GradleLaunchConfigurationMessages.GradleTasksTab_Description_6);
-		column2.setWidth(300);
+		final TreeViewerColumn column2= new TreeViewerColumn(fTreeViewer, SWT.NULL);
+		column2.setLabelProvider(new ColumnLabelProvider() {
+			public String getText(Object node) {
+				return labelProvider.getColumnText(node, 1);
+			}
+		});
+		column2.getColumn().setText(GradleLaunchConfigurationMessages.GradleTasksTab_Description_6);
+		column2.getColumn().setWidth(300);
 
 		//TableLayout only sizes columns once. If showing the tasks
 		//tab as the initial tab, the dialog isn't open when the layout
@@ -165,24 +181,20 @@ public class GradleTasksTab extends AbstractLaunchConfigurationTab implements IP
 		//HACK Bug 139190 
 		getShell().addShellListener(new ShellAdapter() {
 			public void shellActivated(ShellEvent e) {
-				if(!table.isDisposed()) {
-					int tableWidth = table.getSize().x;
+				if(!tree.isDisposed()) {
+					int tableWidth = tree.getSize().x;
 					if (tableWidth > 0) {
 						int c1 = tableWidth / 3;
-						column1.setWidth(c1);
-						column2.setWidth(tableWidth - c1);
+						column1.getColumn().setWidth(c1);
+						column2.getColumn().setWidth(tableWidth - c1);
 					}
 					getShell().removeShellListener(this);
 				}
 			}
 		});
 		
-		fTableViewer = new  CheckboxTableViewer(table);
 
-		fTableViewer.setLabelProvider(new GradleTaskModelLabelProvider());
-		fTableViewer.setContentProvider(new GradleTaskModelContentProvider());
-
-		fTableViewer.addCheckStateListener(new ICheckStateListener() {
+		fTreeViewer.addCheckStateListener(new ICheckStateListener() {
 			public void checkStateChanged(CheckStateChangedEvent event) {
 				updateOrderedTargets(event.getElement(), event.getChecked());
 			}
@@ -200,7 +212,7 @@ public class GradleTasksTab extends AbstractLaunchConfigurationTab implements IP
 	 */
 	private void updateOrderedTargets(Object element , boolean checked) {
 		if (checked) {
-			 selectedTasks.add((TaskView)element);
+			 selectedTasks.add(element);
 		} else {
 			selectedTasks.remove(element);
 		}	 
@@ -208,11 +220,11 @@ public class GradleTasksTab extends AbstractLaunchConfigurationTab implements IP
 	}
 	
 	/**
-	 * Returns all tasks in the buildfile.
+	 * Load all tasks in the buildfile.
 	 * @return all tasks in the buildfile
 	 */
-	private List<TaskView> getTasks() {
-		if (fAllTasks == null || fAllTasks.isEmpty() || isDirty()) {
+	private void loadGradleTaskModel() {
+		if (!model.hasChildren() || isDirty()) {
 
 			setDirty(false);
 			setErrorMessage(null);
@@ -242,19 +254,18 @@ public class GradleTasksTab extends AbstractLaunchConfigurationTab implements IP
 						PlatformUI.getWorkbench().getProgressService().runInUI(context, operation, rule);
 					}
 				}
-			}catch (CoreException e) {
+			} catch (CoreException e) {
 			    GradlePlugin.log("Internal error occurred retrieving targets", e); //$NON-NLS-1$
 			    setErrorMessage(GradleLaunchConfigurationMessages.GradleTasksTab_1);
-			    return null;
-			} 
-			catch (InvocationTargetException e) {
+			    return;
+			} catch (InvocationTargetException e) {
 			    GradlePlugin.log("Internal error occurred retrieving targets", e.getTargetException()); //$NON-NLS-1$
 			    setErrorMessage(GradleLaunchConfigurationMessages.GradleTasksTab_1);
-			    return null;
+			    return;
 			} catch (InterruptedException e) {
 			    GradlePlugin.log("Internal error occurred retrieving targets", e); //$NON-NLS-1$
 			    setErrorMessage(GradleLaunchConfigurationMessages.GradleTasksTab_1);
-			    return null;
+			    return;
 			}
 			
 			if (exceptions[0] != null) {
@@ -267,20 +278,21 @@ public class GradleTasksTab extends AbstractLaunchConfigurationTab implements IP
 					message.append(childStatus.getMessage());
 				}
 				setErrorMessage(message.toString());
-				return new ArrayList<TaskView>();
+				return;
 			}
 			
 			if (allProjects == null) {
-			    //if an error was not thrown during parsing then having no task is valid
-			    return  new ArrayList<TaskView>();
+				//if an error was not thrown during parsing then having no task is valid
+				return;
 			}
-			
-			project = allProjects.get(0);
-			defaultTasks = project.getDefaultTasks();
-			fAllTasks = project.getTasks();
+			if (allProjects.isEmpty() || allProjects.size()>1) {
+				// Not sure why we're not getting a single root project
+				setErrorMessage("Unexpected number of projects returned:" + allProjects.size());
+				return;
+			}
+			rootProject = (ProjectView)allProjects.get(0);
+			model.setRootProject(rootProject);
 		}
-		
-		return fAllTasks;
 	}
 	
 	/* (non-Javadoc)
@@ -297,25 +309,38 @@ public class GradleTasksTab extends AbstractLaunchConfigurationTab implements IP
 		return GradleImages.getImage(IGradleConstants.IMG_TAB_GRADLE_TASKS);
 	}
 
+	@SuppressWarnings("unchecked")
 	public void initializeFrom(ILaunchConfiguration configuration) {
 		launchConfiguration = configuration;
-		fAllTasks = getTasks();
-		fTableViewer.setInput(project);
+		loadGradleTaskModel();
+		fTreeViewer.setInput(model);
+		List<String> tasks = null;
+		try {
+			tasks = configuration.getAttribute(IGradleConstants.GRADLE_TASKS_ATTRIBUTES, new ArrayList<String>());
+		} catch (CoreException e) {
+			setErrorMessage("Could not retrieve list of previously selected tasks:" + e.getMessage());
+		}
 		
-		//change rows with defaulttasks checked
-		if(defaultTasks!=null){
-			for(TaskView defTask : defaultTasks){
-				fTableViewer.setChecked(defTask, true);
+		//Select previously selected tasks or default tasks
+		if (tasks!=null && !tasks.isEmpty()) {
+			for (String text: tasks) {
+				Object element = model.getElement(text);
+				if (element!=null)
+					fTreeViewer.setChecked(element, true);
+			}
+		} else if(model.hasDefaultTasks()) {
+			for(TaskView defTask : model.getDefaultTasks()){
+				fTreeViewer.setChecked(defTask, true);
 			}			
 		}
-		fTableViewer.refresh();
+		fTreeViewer.refresh();
 	}
 	
 	public void performApply(ILaunchConfigurationWorkingCopy configuration) {
 		//build tasks string
 		List<String> taskList = new ArrayList<String>();
-		for(TaskView task : selectedTasks){
-			taskList.add(task.toString());
+		for(Object element : selectedTasks){
+			taskList.add(labelProvider.getText(element));
 		}
 		
 		configuration.setAttribute(IGradleConstants.GRADLE_TASKS_ATTRIBUTES, taskList);
@@ -324,8 +349,8 @@ public class GradleTasksTab extends AbstractLaunchConfigurationTab implements IP
 
 	public void setDefaults(ILaunchConfigurationWorkingCopy configuration) {
 		//change rows with defaulttasks checked
-		for(TaskView defTask : defaultTasks){
-			fTableViewer.setChecked(defTask, true);
+		for(TaskView defTask : model.getDefaultTasks()){
+			fTreeViewer.setChecked(defTask, true);
 		}
 	}
 
