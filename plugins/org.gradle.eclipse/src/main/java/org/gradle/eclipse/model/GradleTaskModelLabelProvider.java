@@ -15,9 +15,9 @@
  */
 package org.gradle.eclipse.model;
 
+import org.eclipse.jface.viewers.ColumnLabelProvider;
 import org.eclipse.jface.viewers.IColorProvider;
 import org.eclipse.jface.viewers.ITableLabelProvider;
-import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Image;
@@ -27,10 +27,11 @@ import org.gradle.eclipse.IGradleConstants;
 import org.gradle.foundation.TaskView;
 
 /**
+ * @author François Rey
  * @author Rene Groeschke
  *
  */
-public class GradleTaskModelLabelProvider extends LabelProvider implements ITableLabelProvider, IColorProvider {
+public class GradleTaskModelLabelProvider extends ColumnLabelProvider implements ITableLabelProvider, IColorProvider {
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.jface.viewers.ITableLabelProvider#getColumnImage(java.lang.Object, int)
@@ -45,35 +46,41 @@ public class GradleTaskModelLabelProvider extends LabelProvider implements ITabl
 	/* (non-Javadoc)
 	 * @see org.eclipse.jface.viewers.ITableLabelProvider#getColumnText(java.lang.Object, int)
 	 */
-	public String getColumnText(Object element, int columnIndex) {
+	public String getColumnText(Object node, int columnIndex) {
 		if (columnIndex == 0){
-			return getText(element);
+			return getText(node);
 		}
-		String desc= ((TaskView)element).getDescription();
-		if (desc == null) {
-			return ""; //$NON-NLS-1$
+		StringBuilder text=new StringBuilder();
+		if (node instanceof GradleTaskGroup) {
+			text.append("*:");
+			text.append(((GradleTaskGroup)node).getName());
 		}
-		return desc;
+		if (node instanceof TaskView) {
+			String desc= ((TaskView)node).getDescription();
+			if (desc != null) text.append(desc);
+		}
+		return text.toString();
 	}
 	
 	/* (non-Javadoc)
 	 * @see org.eclipse.jface.viewers.ILabelProvider#getImage(Object)
 	 */
-	public Image getImage(Object anElement) {
-		TaskView node = (TaskView)anElement;
-		if(node.isDefault()){
-			return GradleImages.getImage(IGradleConstants.IMG_GRADLE_DEFAULT_TASK);
-		}else{
-			return GradleImages.getImage(IGradleConstants.IMG_GRADLE_TASK);
-		}
+	public Image getImage(Object node) {
+		if (!(node instanceof TaskView)) return null;
+		return ((TaskView)node).isDefault() ?
+				GradleImages.getImage(IGradleConstants.IMG_GRADLE_DEFAULT_TASK) :
+				GradleImages.getImage(IGradleConstants.IMG_GRADLE_TASK);
 	}
     
 	/* (non-Javadoc)
 	 * @see org.eclipse.jface.viewers.ILabelProvider#getText(Object)
 	 */
 	public String getText(Object node) {
-		TaskView element= (TaskView) node;
-		return element.getFullTaskName();
+		if (node instanceof GradleTaskGroup)
+			return ((GradleTaskGroup)node).getName();
+		if (node instanceof TaskView)
+			return ((TaskView)node).getFullTaskName();
+		return node.toString();
 	}
 
 	public Color getForeground(Object node) {

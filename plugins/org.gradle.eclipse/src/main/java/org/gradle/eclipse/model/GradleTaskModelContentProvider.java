@@ -15,24 +15,27 @@
  */
 package org.gradle.eclipse.model;
 
-import java.util.List;
-
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.Viewer;
-import org.gradle.foundation.ProjectView;
 import org.gradle.foundation.TaskView;
 
 /**
+ * @author François Rey
  * @author Rene Groeschke
  *
  */
 public class GradleTaskModelContentProvider implements ITreeContentProvider {
 
-	protected static final Object[] EMPTY_ARRAY= new Object[0];
-	
+	private GradleTaskModel model;
+
 	/**
 	 * @see org.eclipse.jface.viewers.IContentProvider#dispose()
 	 */
+	public GradleTaskModelContentProvider(GradleTaskModel model) {
+		super();
+		this.model = model;
+	}
+
 	public void dispose() {
 	}
     
@@ -44,52 +47,47 @@ public class GradleTaskModelContentProvider implements ITreeContentProvider {
 	}
 
 	/* (non-Javadoc)
+	 * @see org.eclipse.jface.viewers.IStructuredContentProvider#getElements(Object)
+	 */
+	public Object[] getElements(Object inputElement) {
+		if (inputElement instanceof AbstractGradleTaskModelElement) {
+			AbstractGradleTaskModelElement element = (AbstractGradleTaskModelElement) inputElement;
+			return element.getElements();
+		}
+		return AbstractGradleTaskModelElement.EMPTY_ARRAY;
+	}
+
+	/* (non-Javadoc)
 	 * @see org.eclipse.jface.viewers.ITreeContentProvider#getChildren(Object)
 	 */
-	public Object[] getChildren(Object parentNode) {		
-		if (parentNode instanceof ProjectView) {
-			ProjectView parentElement = (ProjectView)parentNode;
-			List<TaskView> children = parentElement.getTasks();
-			return children.toArray();
-		} 
-		return EMPTY_ARRAY;
+	public Object[] getChildren(Object parentNode) {
+		return getElements(parentNode);
 	}
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.jface.viewers.ITreeContentProvider#getParent(Object)
 	 */
 	public Object getParent(Object aNode) {
-		if(aNode instanceof TaskView){
-			return ((TaskView)aNode).getProject();
+		if (aNode instanceof GradleTaskGroup) {
+			return model;
 		}
-		return EMPTY_ARRAY;
+		if(aNode instanceof TaskView){
+			if (model.containsTask(aNode)) return model;
+			for (GradleTaskGroup group: model.getGroups())
+				if (group.containsTask(aNode))
+					return group;
+		}
+		return null;
 	}
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.jface.viewers.ITreeContentProvider#hasChildren(Object)
 	 */
 	public boolean hasChildren(Object aNode) {
-		if(aNode instanceof ProjectView){
-			return true;
+		if (aNode instanceof AbstractGradleTaskModelElement) {
+			AbstractGradleTaskModelElement element = (AbstractGradleTaskModelElement) aNode;
+			return element.hasChildren();
 		}
 		return false;
-	}
-
-	/* (non-Javadoc)
-	 * @see org.eclipse.jface.viewers.IStructuredContentProvider#getElements(Object)
-	 */
-	public Object[] getElements(Object inputElement) {
-		if (inputElement instanceof ProjectView) {
-		    List<TaskView> tasks = ((ProjectView) inputElement).getTasks();
-		    if (tasks.size() == 0) {
-				return new TaskView[0];
-			} 
-			return tasks.toArray();
-		}
-		
-		if (inputElement instanceof Object[]) {
-			return (Object[])inputElement;
-		}
-		return EMPTY_ARRAY;
 	}
 }
