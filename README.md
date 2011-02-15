@@ -15,10 +15,11 @@ Branches
 
 Contributing
 ------------
-If you want to provide a contribution it's best to do so by forking the original project and make your changes inside a new branch of the fork.
-Committing changes into a branch that comes from the original project is not recommended, see discussion [here](http://stackoverflow.com/questions/4890432/git-workflow-for-development-on-fork) and [here](http://groups.google.com/group/github/msg/cfeb119173ddc9da)
-You also need to create your own "master" branch in which you can merge all your branches and other commits from elsewhere you may want for yourself.
-With each change/feature in its own branch it becomes easier for the original project to pull each branch independently, in other words it allows cherry-picking branches instead cherry-picking commits.
+If you want to provide a contribution it's best to do so by forking the original project and make your changes inside your own new branch in your fork.
+Having each change/feature in its own unique branch makes it easier for the original project to pull each branch independently, thus allowing cherry-picking branches before the need for cherry-picking commits.
+Such branches are usually called "topic branches", as described [here](https://github.com/dchelimsky/rspec/wiki/Topic-Branches) and [here](http://stackoverflow.com/questions/284514/what-is-a-git-topic-branch).
+You may also want to create your own "master" branch in which you can merge all your branches and other commits from elsewhere you may need for yourself.
 To signal your changes you can create issues or pull requests in the original project and link to the corresponding branch in your fork.
-When the original projects commits new changes, you need to bring these changes into your fork by rebasing your new branches.
+When the original projects commits new changes, you need to bring these changes into your fork by rebasing your branches.
+Once the topic branch has been merged into the original project, you probably want to delete it and rebase your own master branch.
 
