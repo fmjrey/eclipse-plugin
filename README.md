@@ -6,10 +6,17 @@ cloned by fmjrey
 This project is a clone of the original project [here on github](/gradle/eclipse-plugin).
 It introduces a few changes to the original which are all contained in new branches.
 
-Branches
--------
+Main Branches
+-------------
+
+*REBASE WARNING*
+The only branches that will not be rebased are the main branches listed below. If you are cloning this repository you are strongly advised to create your own branches based on these. Other branches like topic branches may be rebased over time in order to keep track with upstream changes.
 
 * [fmjrey](/fmjrey/eclipse-plugin/tree/fmjrey) -- my own master branch, which merges of the other branches below and may contain other commit found elsewhere
+
+Topic Branches
+--------------
+
 * [upgrade](/fmjrey/eclipse-plugin/tree/upgrade) -- upgrades of gradle are made in this branch
 * [task-tab-subprojects](/fmjrey/eclipse-plugin/tree/task-tab-subprojects) -- new feature: add subproject tasks in launch configuration
 
