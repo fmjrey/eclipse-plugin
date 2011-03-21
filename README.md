@@ -12,7 +12,7 @@ Main Branches
 *REBASE WARNING*
 The only branches that will not be rebased are the main branches listed below. If you are cloning this repository you are strongly advised to create your own branches based on these. Other branches like topic branches may be rebased over time in order to keep track with upstream changes.
 
-* [fmjrey](/fmjrey/eclipse-plugin/tree/fmjrey) -- my own master branch, which merges of the other branches below and may contain other commit found elsewhere
+* [fmjrey](/fmjrey/eclipse-plugin/tree/fmjrey) -- my own master branch, which merges other branches below and may contain other commit found elsewhere
 
 Topic Branches
 --------------
