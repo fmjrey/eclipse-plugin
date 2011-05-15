@@ -48,8 +48,8 @@ buildscript {
 		add(new org.apache.ivy.plugins.resolver.URLResolver()) {
 			name = 'pdePluginRepo'
 			addArtifactPattern('https://github.com/breskeby/gradleplugins/raw/gradle-eplugin-build/pdePlugin/dists/[artifact]-[revision](-[classifier])(.[ext])')
-			}
-	} 
+		}
+	}
 	dependencies {
 		classpath ':pdePlugin:5.0'
 	}
