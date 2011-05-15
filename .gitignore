@@ -1,5 +1,7 @@
 /.gradle
+/gradle
 /.project
 /build
 /gradle-wrapper.properties
 /gradle-wrapper.jar
+/gradle.properties
