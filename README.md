@@ -1,9 +1,12 @@
+Obsolete Project, see [Gradle plugin by SpringSource](http://static.springsource.org/sts/docs/latest/reference/html/gradle/)
+----------------
+
 Gradle Plugin for Eclipse
 =========================
 cloned by fmjrey 
 ----------------
 
-This project is a clone of the original project [here on github](/gradle/eclipse-plugin).
+This project is a clone of the original project that was hosted [here on github](/gradle/eclipse-plugin) but deleted since then.
 It introduces a few changes to the original which are all contained in new branches.
 
 *REBASE WARNING*
